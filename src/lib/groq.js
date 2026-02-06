@@ -3,79 +3,114 @@ import Groq from "groq-sdk";
 const API_KEY = import.meta.env.VITE_GROQ_API_KEY;
 
 const groq = new Groq({
-    apiKey: API_KEY,
-    dangerouslyAllowBrowser: true // Required for client-side usage
+   apiKey: API_KEY,
+   dangerouslyAllowBrowser: true // Required for client-side usage
 });
 
 export const generateModule = async (data) => {
-    try {
-        const prompt = `
+   try {
+      const prompt = `
       Bertindaklah sebagai ahli kurikulum dan guru profesional. Buatkan Modul Ajar lengkap untuk Kurikulum Merdeka dengan pendekatan Pembelajaran Mendalam (Deep Learning).
       
-      Informasi Modul:
-      - Sekolah: SMK Kartanegara Wates Kab. Kediri
-      - Nama Penyusun: ${data.teacherName}
-      - Mata Pelajaran: ${data.subject}
-      - Kelas/Fase: ${data.grade}
-      - Topik/Materi: ${data.topic}
-      - Alokasi Waktu: ${data.duration} (${data.meetings} Pertemuan @ ${data.hoursPerMeeting})
-      - Dimensi Profil Lulusan: ${data.deepLearningDimensions && data.deepLearningDimensions.length > 0 ? data.deepLearningDimensions.join(', ') : 'Dipilih otomatis oleh sistem'}
-      ${data.objectives ? `- Tujuan Pembelajaran Utama: ${data.objectives}` : ''}
-      
-      Informasi Tambahan (Jika ada):
-      ${data.studentCharacteristics ? `- Karakteristik Peserta Didik: ${data.studentCharacteristics}` : ''}
-      ${data.crossDisciplinary ? `- Lintas Disiplin Ilmu: ${data.crossDisciplinary}` : ''}
-      ${data.learningEnvironment ? `- Lingkungan Pembelajaran: ${data.learningEnvironment}` : ''}
-      ${data.digitalTools ? `- Pemanfaatan Digital: ${data.digitalTools}` : ''}
-      ${data.partnerships ? `- Kemitraan: ${data.partnerships}` : ''}
+      Output HARUS berupa format JSON valid tanpa markdown formatting (seperti \`\`\`json). 
+      Struktur JSON harus SEPERSIS berikut ini:
 
-      Struktur Modul Ajar HARUS mencakup:
-      1. Informasi Umum (Identitas, Kompetensi Awal, 8 Dimensi Profil Lulusan, Sarana Prasarana, Target Peserta Didik, Model Pembelajaran)
-      2. Komponen Inti:
-         - Tujuan Pembelajaran
-         - Pemahaman Bermakna
-         - Pertanyaan Pemantik
-         - Kegiatan Pembelajaran (WAJIB dibuatkan detail untuk ${data.meetings} pertemuan, dimana setiap pertemuan terdiri dari ${data.hoursPerMeeting}. Detailkan langkah Pembelajaran Mendalam sesuai 5 Tahap: 
-           1. Tahap Stimulasi (Pertanyaan pemantik/studi kasus)
-           2. Tahap Eksplorasi (Pengumpulan data/diskusi)
-           3. Tahap Elaborasi (Pendalaman/PBL)
-           4. Tahap Aplikasi (Pemecahan masalah nyata)
-           5. Tahap Refleksi (Evaluasi pembelajaran)) yang dibagi menjadi Pendahuluan, Kegiatan Inti, dan Penutup untuk SETIAP PERTEMUAN.
-         - Asesmen (Formatif dan Sumatif) LENGKAP dengan Kriteria/Indikator Penilaian (Rubrik).
-         - Pengayaan dan Remedial
-      3. Lampiran (PENTING: Buat secara detail, jangan hanya deskripsi)
-         - Lembar Kerja Peserta Didik (LKPD): Buatkan contoh soal/aktivitas nyata yang bisa langsung diprint siswa.
-         - Bahan Bacaan Guru & Peserta Didik (Sertakan referensi bacaan dari BUKU dan WEBSITE yang relevan)
-         - Glosarium
-         - Daftar Pustaka
-         
-      4. Tanda Tangan (Format tabel rata kiri-kanan tanpa garis):
-         - Kiri: Mengetahui, Kepala SMK Kartanegara Wates, Pujiono, S.Pd.
-         - Kanan: Guru Mata Pelajaran, ${data.teacherName} (dengan tempat dan tanggal saat ini)
-         
-      Gunakan format Markdown yang rapi. Gunakan heading (#, ##, ###) untuk strukturasi. Berikan tone yang formal namun inspiratif.
-      
-      PENTING:
-      Jika informasi tambahan kosong, gunakan standar umum yang wajar untuk fase tersebut.
-      JANGAN MENGARANG detail spesifik (seperti nama siswa, kondisi disabilitas spesifik, atau sarana yang sangat spesifik) KECUALI disebutkan dalam input.
-      Fokus pada konten pembelajaran yang universal namun mendalam.
+      {
+        "informasiUmum": {
+          "sekolah": "SMK Kartanegara Wates Kab. Kediri",
+          "namaPenyusun": "${data.teacherName}",
+          "mataPelajaran": "${data.subject}",
+          "kelas": "${data.grade}",
+          "alokasiWaktu": "${data.duration} (${data.meetings} Pertemuan @ ${data.hoursPerMeeting})",
+          "pesertaDidik": "${data.studentCharacteristics || 'Reguler/Tipikal'}",
+          "materiPelajaran": "${data.topic}",
+          "dimensiProfil": ${JSON.stringify(data.deepLearningDimensions || [])}
+        },
+        "identifikasi": {
+           "dpl": [
+             // HARUS persis sesuai dengan yang dipilih user di informasiUmum.dimensiProfil
+             // Jangan menambah atau mengurangi dimensi selain yang dipilih.
+             // Format: { "kode": "DPL X", "judul": "Nama Dimensi (Sesuai Input)", "deskripsi": "Deskripsi singkat..." }
+           ]
+        },
+        "desainPembelajaran": {
+           "capaianPembelajaran": "Tuliskan capaian pembelajaran sesuai fase",
+           "lintasDisiplin": "${data.crossDisciplinary || '-'}",
+           "tujuanPembelajaran": "${data.objectives || 'Rumuskan kompetensi yang diharapkan...'}",
+           "topik": "${data.topic}",
+           "praktikPedagogis": "Model/Strategi/Metode yang ditentukan (misal PjBL/PBL) untuk mencapai tujuan...",
+           "kemitraan": "${data.partnerships || '-'}",
+           "lingkungan": "${data.learningEnvironment || '-'}",
+           "digital": "${data.digitalTools || '-'}"
+        },
+        "pengalamanBelajar": {
+           "pendahuluan": {
+              "prinsip": "Berkesadaran, Bermakna, Menggembirakan",
+              "deskripsi": "Deskripsi kegiatan pembuka..."
+           },
+           "inti": { 
+             // Inti dibagi menjadi 3 tahap utama Deep Learning
+             "memahami": {
+                "prinsip": "Berkesadaran, Bermakna, Menggembirakan",
+                "kegiatan": ["1. ...", "2. ..."]
+             },
+             "mengaplikasi": {
+                "prinsip": "Berkesadaran, Bermakna, Menggembirakan",
+                "kegiatan": ["1. ...", "2. ..."]
+             },
+             "merefleksi": {
+                "prinsip": "Berkesadaran, Bermakna, Menggembirakan",
+                "kegiatan": ["1. ...", "2. ..."]
+             }
+           }
+        },
+        "penutup": {
+           "prinsip": "Berkesadaran, Bermakna, Menggembirakan",
+           "deskripsi": "Tahap akhir proses pembelajaran...",
+           "asesmen": {
+              "awal": "Asesmen pada Awal Pembelajaran...",
+              "proses": "Asesmen pada Proses Pembelajaran...",
+              "akhir": "Asesmen pada Akhir Pembelajaran...",
+              "detail": "Asesmen dalam pembelajaran mendalam disesuaikan dengan assessment as/for/of learning..."
+           }
+        },
+        "rubrik": {
+           "judul": "Rubrik Penilaian Diskusi Kelas",
+           "tujuan": "...",
+           "indikator": [
+              // Array of rows 
+              // { "aspek": "Partisipasi", "baruBerkembang": "...", "layak": "...", "cakap": "...", "mahir": "..." }
+           ],
+           "keterangan": [
+             "Baru Berkembang: ...",
+             "Layak: ...", 
+             // ...
+           ]
+        }
+      }
+
+      Isi konten dengan detail pendidikan yang sesuai dengan input berikut:
+      Topik: ${data.topic}
+      Tujuan: ${data.objectives || '-'}
+      Karakteristik Siswa: ${data.studentCharacteristics || '-'}
     `;
 
-        const completion = await groq.chat.completions.create({
-            messages: [
-                {
-                    role: "user",
-                    content: prompt
-                }
-            ],
-            model: "llama-3.3-70b-versatile",
-            temperature: 0.7,
-            max_tokens: 4096,
-        });
+      const completion = await groq.chat.completions.create({
+         messages: [
+            {
+               role: "user",
+               content: prompt
+            }
+         ],
+         model: "llama-3.3-70b-versatile",
+         temperature: 0.7,
+         max_tokens: 8192,
+         response_format: { type: "json_object" }
+      });
 
-        return completion.choices[0]?.message?.content || "Gagal membuat modul.";
-    } catch (error) {
-        console.error("Error generating module with Groq:", error);
-        throw error;
-    }
+      return completion.choices[0]?.message?.content || "Gagal membuat modul.";
+   } catch (error) {
+      console.error("Error generating module with Groq:", error);
+      throw error;
+   }
 };
