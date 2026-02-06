@@ -21,13 +21,15 @@ const DEEP_LEARNING_DIMENSIONS = [
     "Komunikasi"
 ];
 
-const GeneratorForm = ({ onGenerate, isGenerating }) => {
+const GeneratorForm = ({ onGenerate, isGenerating, initialData }) => {
     const [step, setStep] = useState(1);
-    const [formData, setFormData] = useState({
+    const [formData, setFormData] = useState(initialData || {
         teacherName: '',
         subject: '',
         grade: '',
+        semester: 'Ganjil',
         topic: '',
+        element: '',
         duration: '',
         meetings: '',
         hoursPerMeeting: '',
@@ -40,7 +42,8 @@ const GeneratorForm = ({ onGenerate, isGenerating }) => {
         crossDisciplinary: '',
         learningEnvironment: '',
         digitalTools: '',
-        partnerships: ''
+        partnerships: '',
+        saranaPrasarana: ''
     });
 
     const handleChange = (e) => {
@@ -73,7 +76,8 @@ const GeneratorForm = ({ onGenerate, isGenerating }) => {
             !formData.crossDisciplinary &&
             !formData.learningEnvironment &&
             !formData.digitalTools &&
-            !formData.partnerships;
+            !formData.partnerships &&
+            !formData.saranaPrasarana;
 
         if (isStep3Empty) {
             const confirm = window.confirm(
@@ -102,7 +106,7 @@ const GeneratorForm = ({ onGenerate, isGenerating }) => {
                 />
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div className="space-y-2">
                     <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
                         <BookOpen size={16} /> Mata Pelajaran
@@ -135,6 +139,22 @@ const GeneratorForm = ({ onGenerate, isGenerating }) => {
                         <option value="Kelas XII (Fase F)">Kelas XII (Fase F)</option>
                     </select>
                 </div>
+
+                <div className="space-y-2">
+                    <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                        <Calendar size={16} /> Semester
+                    </label>
+                    <select
+                        name="semester"
+                        required
+                        value={formData.semester}
+                        onChange={handleChange}
+                        className="input-field"
+                    >
+                        <option value="Ganjil">Ganjil</option>
+                        <option value="Genap">Genap</option>
+                    </select>
+                </div>
             </div>
 
             <div className="space-y-2">
@@ -148,6 +168,21 @@ const GeneratorForm = ({ onGenerate, isGenerating }) => {
                     value={formData.topic}
                     onChange={handleChange}
                     placeholder="Contoh: Persamaan Kuadrat"
+                    className="input-field"
+                />
+            </div>
+
+            <div className="space-y-2">
+                <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                    <Layers size={16} /> Elemen
+                </label>
+                <input
+                    type="text"
+                    name="element"
+                    required
+                    value={formData.element}
+                    onChange={handleChange}
+                    placeholder="Contoh: Aljabar"
                     className="input-field"
                 />
             </div>
@@ -344,6 +379,19 @@ const GeneratorForm = ({ onGenerate, isGenerating }) => {
                     placeholder="cth: Kolaborasi dengan guru mapel lain, orang tua, komunitas..."
                     className="input-field"
                     rows="2"
+                />
+            </div>
+
+            <div className="space-y-2">
+                <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                    Sarana & Prasarana <span className="text-slate-400 font-normal">(Opsional)</span>
+                </label>
+                <textarea
+                    name="saranaPrasarana"
+                    value={formData.saranaPrasarana}
+                    onChange={handleChange}
+                    placeholder="Alat, bahan, atau media yang dibutuhkan..."
+                    className="input-field min-h-[80px] resize-y"
                 />
             </div>
         </div>

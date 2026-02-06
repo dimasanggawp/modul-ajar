@@ -9,18 +9,17 @@ const Dashboard = () => {
             title: "Rencana Pembelajaran Mendalam",
             description: "Buat modul ajar lengkap dengan pendekatan Deep Learning secara otomatis menggunakan AI.",
             icon: <BrainCircuit size={40} />,
-            path: "/generator",
+            path: "/generator-rencana-pembelajaran-mendalam",
             color: "bg-blue-600"
         },
-        // Placeholder for future apps
-        // {
-        //     id: 2,
-        //     title: "Aplikasi Lain",
-        //     description: "Deskripsi aplikasi lain...",
-        //     icon: <BookOpen size={40} />,
-        //     path: "#",
-        //     color: "bg-emerald-600"
-        // }
+        {
+            id: 2,
+            title: "Modul Ajar",
+            description: "Buat modul ajar standar Kurikulum Merdeka dengan mudah dan cepat.",
+            icon: <BookOpen size={40} />,
+            path: "/generator-modul-ajar",
+            color: "bg-emerald-600"
+        }
     ];
 
     return (
@@ -47,10 +46,10 @@ const Dashboard = () => {
                                 {app.icon}
                             </div>
                             <div className="p-8">
-                                <h3 className="text-xl font-bold text-slate-800 mb-3 group-hover:text-primary-600 transition-colors">
+                                <h3 className="text-xl font-bold text-slate-800 mb-3 group-hover:text-primary-600 transition-colors text-center">
                                     {app.title}
                                 </h3>
-                                <p className="text-slate-500 leading-relaxed">
+                                <p className="text-slate-500 leading-relaxed text-justify">
                                     {app.description}
                                 </p>
                                 <div className="mt-6 flex items-center text-primary-600 font-medium opacity-0 group-hover:opacity-100 transform translate-x-[-10px] group-hover:translate-x-0 transition-all duration-300">
