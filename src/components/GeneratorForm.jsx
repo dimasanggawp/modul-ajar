@@ -11,14 +11,59 @@ const PEDAGOGICAL_PRACTICES = [
 ];
 
 const DEEP_LEARNING_DIMENSIONS = [
-    "Keimanan dan ketakwaan kepada Tuhan YME",
-    "Kewargaan",
-    "Penalaran Kritis",
-    "Kreativitas",
-    "Kolaborasi",
-    "Kemandirian",
-    "Kesehatan",
-    "Komunikasi"
+    {
+        label: "Keimanan dan Ketakwaan terhadap Tuhan YME",
+    },
+    {
+        label: "Kewargaan",
+    },
+    {
+        label: "Penalaran Kritis",
+    },
+    {
+        label: "Kreativitas",
+    },
+    {
+        label: "Kolaborasi",
+    },
+    {
+        label: "Kemandirian",
+    },
+    {
+        label: "Kesehatan",
+    },
+    {
+        label: "Komunikasi",
+    }
+];
+
+const INITIAL_ASSESSMENT_OPTIONS = [
+    {
+        category: "Asesmen Diagnostik Kognitif (Mengetahui Pengetahuan Awal)",
+        options: [
+            "Tes Tertulis Singkat: Kuis singkat atau pertanyaan pilihan ganda tentang materi prasyarat.",
+            "Kuis Lisan: Pertanyaan langsung untuk menilai pemahaman konsep dasar.",
+            "Pemetaan Konsep (Mind Map): Siswa membuat peta konsep untuk menunjukkan hubungan antar ide.",
+            "Analisis Kesalahan: Mengidentifikasi pola kesalahan umum siswa."
+        ]
+    },
+    {
+        category: "Asesmen Diagnostik Non-Kognitif (Mengetahui Aspek Non-Akademik)",
+        options: [
+            "Survei Minat & Gaya Belajar: Angket untuk mengetahui minat, motivasi, dan preferensi belajar.",
+            "Wawancara & Diskusi Ringan: Percakapan untuk menggali harapan, kondisi sosial-emosional.",
+            "Jurnal Refleksi: Siswa menuliskan harapan atau perasaan mereka tentang pelajaran.",
+            "Observasi: Mengamati perilaku, karakter, dan interaksi siswa."
+        ]
+    },
+    {
+        category: "Asesmen Kesiapan Belajar (Mengetahui Kesiapan Mengikuti Pembelajaran)",
+        options: [
+            "Checklist Keterampilan Prasyarat: Daftar cek untuk menilai keterampilan dasar yang dibutuhkan.",
+            "Tugas Berbasis Diferensiasi: Memberikan tugas dengan tingkat kesulitan berbeda.",
+            "Kegiatan Bermain & Kreatif: Aktivitas seperti menggambar atau role play untuk mengamati potensi."
+        ]
+    }
 ];
 
 const GeneratorForm = ({ onGenerate, isGenerating, initialData }) => {
@@ -35,6 +80,7 @@ const GeneratorForm = ({ onGenerate, isGenerating, initialData }) => {
         learningOutcome: '',
         learningGoals: '',
         deepLearningDimensions: [],
+        initialAssessment: '',
         pedagogicalPractice: '',
         // Step 3: Detail Tambahan
         studentCharacteristics: '',
@@ -226,6 +272,28 @@ const GeneratorForm = ({ onGenerate, isGenerating, initialData }) => {
         <div className="space-y-6 animate-fade-in">
             <div className="space-y-2">
                 <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                    <Sparkles size={16} /> Asesmen Awal
+                </label>
+                <select
+                    name="initialAssessment"
+                    required
+                    value={formData.initialAssessment}
+                    onChange={handleChange}
+                    className="input-field"
+                >
+                    <option value="" disabled>Pilih Asesmen Awal</option>
+                    {INITIAL_ASSESSMENT_OPTIONS.map((group, idx) => (
+                        <optgroup key={idx} label={group.category}>
+                            {group.options.map((option, optIdx) => (
+                                <option key={optIdx} value={option}>{option}</option>
+                            ))}
+                        </optgroup>
+                    ))}
+                </select>
+            </div>
+
+            <div className="space-y-2">
+                <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
                     <Lightbulb size={16} /> Praktek Pedagogis
                 </label>
                 <select
@@ -275,23 +343,32 @@ const GeneratorForm = ({ onGenerate, isGenerating, initialData }) => {
                     <UserCheck size={16} /> Dimensi Profil Lulusan (Deep Learning)
                 </label>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    {DEEP_LEARNING_DIMENSIONS.map((dim, index) => (
-                        <div key={index} className="flex items-center space-x-2 bg-slate-50 p-3 rounded-lg border border-slate-200 hover:border-primary-300 transition-colors">
-                            <input
-                                type="checkbox"
-                                id={`dim-${index}`}
-                                checked={formData.deepLearningDimensions.includes(dim)}
-                                onChange={() => handleDimensionChange(dim)}
-                                className="w-4 h-4 text-primary-600 rounded border-slate-300 focus:ring-primary-500 cursor-pointer"
-                            />
-                            <label
-                                htmlFor={`dim-${index}`}
-                                className="text-sm text-slate-700 cursor-pointer select-none flex-1"
-                            >
-                                {dim}
-                            </label>
-                        </div>
-                    ))}
+                    {DEEP_LEARNING_DIMENSIONS.map((dim, index) => {
+                        const value = dim.label || dim; // Handle object or string
+                        const description = dim.description;
+
+                        return (
+                            <div key={index} className="flex items-center space-x-2 bg-slate-50 p-2 rounded-lg border border-slate-200 hover:border-primary-300 transition-colors">
+                                <input
+                                    type="checkbox"
+                                    id={`dim-${index}`}
+                                    checked={formData.deepLearningDimensions.includes(value)}
+                                    onChange={() => handleDimensionChange(value)}
+                                    className="w-4 h-4 text-primary-600 rounded border-slate-300 focus:ring-primary-500 cursor-pointer"
+                                />
+                                <label
+                                    htmlFor={`dim-${index}`}
+                                    className="text-sm cursor-pointer select-none flex-1 truncate"
+                                    title={description || value}
+                                >
+                                    <span className="font-medium text-slate-700">{value}</span>
+                                    {description && (
+                                        <span className="text-xs text-slate-500 block truncate">{description}</span>
+                                    )}
+                                </label>
+                            </div>
+                        );
+                    })}
                 </div>
             </div>
         </div>

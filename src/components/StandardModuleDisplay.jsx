@@ -546,6 +546,7 @@ const ModuleView = ({ content, onReset, onEdit }) => {
                                             <li><strong>Jenis:</strong> {Array.isArray(kompetensiInti.asesmen.jenis) ? kompetensiInti.asesmen.jenis.join(', ') : (kompetensiInti.asesmen.jenis || '-')}</li>
                                             <li><strong>Teknik:</strong> {kompetensiInti.asesmen.teknik || '-'}</li>
                                             {kompetensiInti.asesmen.instrumen && <li><strong>Instrumen:</strong> {kompetensiInti.asesmen.instrumen}</li>}
+                                            {kompetensiInti.asesmen.awal && <li><strong>Asesmen Awal:</strong> {kompetensiInti.asesmen.awal}</li>}
                                         </>
                                     ) : (
                                         <li>-</li>

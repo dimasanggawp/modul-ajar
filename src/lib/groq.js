@@ -81,7 +81,7 @@ export const generateModule = async (data) => {
         "penutup": {
            // Global closing/assessment info
            "asesmen": {
-              "awal": "Asesmen pada Awal Pembelajaran...",
+              "awal": "${data.initialAssessment || 'Asesmen pada Awal Pembelajaran...'}",
               "proses": "Asesmen pada Proses Pembelajaran...",
               "akhir": "Asesmen pada Akhir Pembelajaran...",
               "detail": "Asesmen dalam pembelajaran mendalam disesuaikan dengan assessment as/for/of learning..."
@@ -213,7 +213,8 @@ export const generateStandardModule = async (data) => {
             ],
             "asesmen": {
                "jenis": ["Formatif", "Sumatif"],
-               "teknik": "Observasi, Tes Tulis"
+               "teknik": "Observasi, Tes Tulis",
+               "awal": "${data.initialAssessment || 'Asesmen pada Awal Pembelajaran...'}"
             }
          },
          "lampiran": {

@@ -19,6 +19,35 @@ const PROFIL_PELAJAR_PANCASILA = [
     "Kreatif"
 ];
 
+const INITIAL_ASSESSMENT_OPTIONS = [
+    {
+        category: "Asesmen Diagnostik Kognitif (Mengetahui Pengetahuan Awal)",
+        options: [
+            "Tes Tertulis Singkat: Kuis singkat atau pertanyaan pilihan ganda tentang materi prasyarat.",
+            "Kuis Lisan: Pertanyaan langsung untuk menilai pemahaman konsep dasar.",
+            "Pemetaan Konsep (Mind Map): Siswa membuat peta konsep untuk menunjukkan hubungan antar ide.",
+            "Analisis Kesalahan: Mengidentifikasi pola kesalahan umum siswa."
+        ]
+    },
+    {
+        category: "Asesmen Diagnostik Non-Kognitif (Mengetahui Aspek Non-Akademik)",
+        options: [
+            "Survei Minat & Gaya Belajar: Angket untuk mengetahui minat, motivasi, dan preferensi belajar.",
+            "Wawancara & Diskusi Ringan: Percakapan untuk menggali harapan, kondisi sosial-emosional.",
+            "Jurnal Refleksi: Siswa menuliskan harapan atau perasaan mereka tentang pelajaran.",
+            "Observasi: Mengamati perilaku, karakter, dan interaksi siswa."
+        ]
+    },
+    {
+        category: "Asesmen Kesiapan Belajar (Mengetahui Kesiapan Mengikuti Pembelajaran)",
+        options: [
+            "Checklist Keterampilan Prasyarat: Daftar cek untuk menilai keterampilan dasar yang dibutuhkan.",
+            "Tugas Berbasis Diferensiasi: Memberikan tugas dengan tingkat kesulitan berbeda.",
+            "Kegiatan Bermain & Kreatif: Aktivitas seperti menggambar atau role play untuk mengamati potensi."
+        ]
+    }
+];
+
 const ModulAjarForm = ({ onGenerate, isGenerating, initialData }) => {
     const [step, setStep] = useState(1);
     const [formData, setFormData] = useState(initialData || {
@@ -34,6 +63,7 @@ const ModulAjarForm = ({ onGenerate, isGenerating, initialData }) => {
         learningOutcome: '',
         learningGoals: '',
         profilPelajarPancasila: [],
+        initialAssessment: '',
         pedagogicalPractice: '',
         // Step 3: Detail Tambahan
         studentCharacteristics: '',
@@ -239,6 +269,28 @@ const ModulAjarForm = ({ onGenerate, isGenerating, initialData }) => {
 
     const renderStep2 = () => (
         <div className="space-y-6 animate-fade-in">
+            <div className="space-y-2">
+                <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                    <Sparkles size={16} /> Asesmen Awal
+                </label>
+                <select
+                    name="initialAssessment"
+                    required
+                    value={formData.initialAssessment}
+                    onChange={handleChange}
+                    className="input-field"
+                >
+                    <option value="" disabled>Pilih Asesmen Awal</option>
+                    {INITIAL_ASSESSMENT_OPTIONS.map((group, idx) => (
+                        <optgroup key={idx} label={group.category}>
+                            {group.options.map((option, optIdx) => (
+                                <option key={optIdx} value={option}>{option}</option>
+                            ))}
+                        </optgroup>
+                    ))}
+                </select>
+            </div>
+
             <div className="space-y-2">
                 <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
                     <Lightbulb size={16} /> Praktek Pedagogis

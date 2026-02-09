@@ -445,6 +445,13 @@ const ModuleDisplay = ({ content, onReset, onEdit }) => {
                                             </td>
                                             <td colSpan={2}>
                                                 <div className="font-bold mb-2">AWAL ({pertemuan.pendahuluan?.prinsip})</div>
+                                                <ul className="list-decimal pl-5 mb-2">
+                                                    <li>Guru memberikan salam dan mengajak berdoa.</li>
+                                                    <li>Guru mengecek kehadiran peserta didik (Absensi).</li>
+                                                    <li>Guru memberikan motivasi kepada peserta didik.</li>
+                                                    <li>Guru melakukan apersepsi terkait materi.</li>
+                                                    <li>Guru menyampaikan tujuan pembelajaran.</li>
+                                                </ul>
                                                 <div>{pertemuan.pendahuluan?.deskripsi}</div>
                                             </td>
                                         </tr>
