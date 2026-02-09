@@ -7,7 +7,7 @@ const Dashboard = () => {
         {
             id: 1,
             title: "Rencana Pembelajaran Mendalam",
-            description: "Buat modul ajar lengkap dengan pendekatan Deep Learning secara otomatis menggunakan AI.",
+            description: "Buat Rencana Pembelajaran Mendalam lengkap dengan pendekatan Deep Learning secara otomatis menggunakan AI.",
             icon: <BrainCircuit size={40} />,
             path: "/generator-rencana-pembelajaran-mendalam",
             color: "bg-blue-600"
@@ -15,7 +15,7 @@ const Dashboard = () => {
         {
             id: 2,
             title: "Modul Ajar",
-            description: "Buat modul ajar standar Kurikulum Merdeka dengan mudah dan cepat.",
+            description: "Buat Modul Ajar standar Kurikulum Merdeka dengan pendekatan Pembelajaran Mendalam secara otomatis menggunakan AI.",
             icon: <BookOpen size={40} />,
             path: "/generator-modul-ajar",
             color: "bg-emerald-600"

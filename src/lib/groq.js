@@ -148,7 +148,7 @@ export const generateStandardModule = async (data) => {
            "profilPelajarPancasila": [
              // PERINTAH PENTING:
              // Anda HARUS HANYA menyertakan dimensi yang dipilih user berikut ini: 
-             // [${(data.deepLearningDimensions || []).join(', ')}]
+             // [${(data.profilPelajarPancasila || data.deepLearningDimensions || []).join(', ')}]
              // JANGAN menambahkan dimensi lain yang tidak diminta.
              // Jika array di atas kosong, baru gunakan semua dimensi.
              // Contoh output:
