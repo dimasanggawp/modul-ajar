@@ -10,8 +10,11 @@ function DeepLearningGenerator() {
     const [isGenerating, setIsGenerating] = useState(false);
     const [error, setError] = useState(null);
 
+    const [savedFormData, setSavedFormData] = useState(null);
+
     const handleGenerate = async (formData) => {
         setIsGenerating(true);
+        setSavedFormData(formData);
         setError(null);
         try {
             const content = await generateModule(formData);
@@ -35,6 +38,12 @@ function DeepLearningGenerator() {
     };
 
     const handleReset = () => {
+        setModuleContent(null);
+        setSavedFormData(null);
+        setError(null);
+    };
+
+    const handleEdit = () => {
         setModuleContent(null);
         setError(null);
     };
@@ -68,9 +77,9 @@ function DeepLearningGenerator() {
                     )}
 
                     {!moduleContent ? (
-                        <GeneratorForm onGenerate={handleGenerate} isGenerating={isGenerating} />
+                        <GeneratorForm onGenerate={handleGenerate} isGenerating={isGenerating} initialData={savedFormData} />
                     ) : (
-                        <ModuleDisplay content={moduleContent} onReset={handleReset} />
+                        <ModuleDisplay content={moduleContent} onReset={handleReset} onEdit={handleEdit} />
                     )}
                 </main>
 

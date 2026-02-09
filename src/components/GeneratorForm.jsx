@@ -29,7 +29,6 @@ const GeneratorForm = ({ onGenerate, isGenerating, initialData }) => {
         grade: '',
         semester: 'Ganjil',
         topic: '',
-        element: '',
         duration: '',
         meetings: '',
         hoursPerMeeting: '',
@@ -42,8 +41,7 @@ const GeneratorForm = ({ onGenerate, isGenerating, initialData }) => {
         crossDisciplinary: '',
         learningEnvironment: '',
         digitalTools: '',
-        partnerships: '',
-        saranaPrasarana: ''
+        partnerships: ''
     });
 
     const handleChange = (e) => {
@@ -76,8 +74,7 @@ const GeneratorForm = ({ onGenerate, isGenerating, initialData }) => {
             !formData.crossDisciplinary &&
             !formData.learningEnvironment &&
             !formData.digitalTools &&
-            !formData.partnerships &&
-            !formData.saranaPrasarana;
+            !formData.partnerships;
 
         if (isStep3Empty) {
             const confirm = window.confirm(
@@ -172,20 +169,6 @@ const GeneratorForm = ({ onGenerate, isGenerating, initialData }) => {
                 />
             </div>
 
-            <div className="space-y-2">
-                <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                    <Layers size={16} /> Elemen
-                </label>
-                <input
-                    type="text"
-                    name="element"
-                    required
-                    value={formData.element}
-                    onChange={handleChange}
-                    placeholder="Contoh: Aljabar"
-                    className="input-field"
-                />
-            </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div className="space-y-2">
@@ -382,18 +365,6 @@ const GeneratorForm = ({ onGenerate, isGenerating, initialData }) => {
                 />
             </div>
 
-            <div className="space-y-2">
-                <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                    Sarana & Prasarana <span className="text-slate-400 font-normal">(Opsional)</span>
-                </label>
-                <textarea
-                    name="saranaPrasarana"
-                    value={formData.saranaPrasarana}
-                    onChange={handleChange}
-                    placeholder="Alat, bahan, atau media yang dibutuhkan..."
-                    className="input-field min-h-[80px] resize-y"
-                />
-            </div>
         </div>
     );
 

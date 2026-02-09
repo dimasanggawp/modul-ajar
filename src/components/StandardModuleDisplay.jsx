@@ -588,14 +588,14 @@ const ModuleView = ({ content, onReset, onEdit }) => {
                                 <td style={{ width: '50%', border: 'none' }}>
                                     <div>Mengetahui,</div>
                                     <div>Kepala Sekolah</div>
-                                    <div className="h-24"></div>
+                                    <br /><br /><br /><br /><br />
                                     <div className="font-bold underline">_______________________</div>
                                     <div>NIP. .........................</div>
                                 </td>
                                 <td style={{ width: '50%', border: 'none' }}>
                                     <div>Wates, {new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</div>
                                     <div>Guru Mata Pelajaran</div>
-                                    <div className="h-24"></div>
+                                    <br /><br /><br /><br /><br />
                                     <div className="font-bold underline">{identitas?.namaPenyusun || '...'}</div>
                                     <div>NIP. .........................</div>
                                 </td>

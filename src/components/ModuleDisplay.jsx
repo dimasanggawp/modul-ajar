@@ -5,7 +5,7 @@ import html2pdf from 'html2pdf.js';
 import { asBlob } from 'html-docx-js-typescript';
 import { saveAs } from 'file-saver';
 
-const ModuleDisplay = ({ content, onReset }) => {
+const ModuleDisplay = ({ content, onReset, onEdit }) => {
     const contentRef = useRef(null);
     const [isDownloading, setIsDownloading] = useState(false);
 
@@ -248,7 +248,7 @@ const ModuleDisplay = ({ content, onReset }) => {
         <div className="w-full max-w-4xl mx-auto space-y-6 animate-slide-up pb-12 font-serif text-slate-900">
             <div className="flex flex-col md:flex-row items-center justify-between sticky top-4 z-10 p-4 rounded-xl glass-panel mx-4 md:mx-0 gap-4 print:hidden">
                 <button
-                    onClick={onReset}
+                    onClick={onEdit || onReset}
                     className="flex items-center gap-2 text-slate-600 hover:text-primary-600 font-medium transition-colors"
                 >
                     <ArrowLeft size={20} />
@@ -584,13 +584,13 @@ const ModuleDisplay = ({ content, onReset }) => {
                                     <td style={{ width: '50%' }}>
                                         <div>Mengetahui,</div>
                                         <div>Kepala SMK Kartanegara Wates</div>
-                                        <div className="h-24"></div>
+                                        <br /><br /><br /><br /><br />
                                         <div className="font-bold underline">Pujiono, S.Pd.</div>
                                     </td>
                                     <td style={{ width: '50%' }}>
                                         <div>Wates, {new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</div>
                                         <div>Guru Mata Pelajaran</div>
-                                        <div className="h-24"></div>
+                                        <br /><br /><br /><br /><br />
                                         <div className="font-bold underline">{informasiUmum?.namaPenyusun}</div>
                                     </td>
                                 </tr>
