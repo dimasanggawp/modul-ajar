@@ -285,7 +285,7 @@ const ModuleDisplay = ({ content, onReset, onEdit }) => {
 
                     {/* Header Section */}
                     <div className="mb-6">
-                        <h3 className="uppercase font-bold mb-4" style={{ fontSize: '11pt' }}>PERENCANAAN PEMBELAJARAN MENDALAM</h3>
+                        <h3 className="uppercase font-bold mb-4" style={{ fontSize: '11pt' }}>RENCANA PEMBELAJARAN MENDALAM</h3>
                         <table className="no-border-table mb-4" style={{ maxWidth: '600px' }}>
                             <tbody>
                                 <tr><td style={{ width: '200px' }}>SEKOLAH</td><td>: {informasiUmum?.sekolah}</td></tr>
@@ -375,7 +375,26 @@ const ModuleDisplay = ({ content, onReset, onEdit }) => {
                             </tr>
                             <tr>
                                 <td style={{ fontWeight: 'bold' }}>Tujuan Pembelajaran</td>
-                                <td>{desainPembelajaran?.tujuanPembelajaran}</td>
+                                <td>
+                                    {(() => {
+                                        const text = desainPembelajaran?.tujuanPembelajaran || '-';
+                                        // Split by newlines or numbered lists (e.g. "1. ", "2. ")
+                                        // The regex /(?=\d+\.)/ uses lookahead to split BEFORE the number, keeping the number.
+                                        const parts = text.split(/(?:\r\n|\r|\n)|(?=\d+\.\s)/).filter(Boolean);
+
+                                        if (parts.length === 0) return '-';
+
+                                        return (
+                                            <div className="space-y-1">
+                                                {parts.map((part, idx) => (
+                                                    <div key={idx} className="leading-relaxed">
+                                                        {part.trim()}
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        );
+                                    })()}
+                                </td>
                             </tr>
                             <tr>
                                 <td style={{ fontWeight: 'bold' }}>Topik Pembelajaran</td>
@@ -408,75 +427,176 @@ const ModuleDisplay = ({ content, onReset, onEdit }) => {
                             </tr>
                         </thead>
                         <tbody>
-                            {/* Pendahuluan */}
-                            <tr>
-                                <td rowSpan={1} style={{ width: '20%', fontWeight: 'bold', verticalAlign: 'middle', textAlign: 'center' }}>
-                                    PENGALAMAN<br />BELAJAR
-                                </td>
-                                <td colSpan={2}>
-                                    <div className="font-bold mb-2">AWAL ({pengalamanBelajar?.pendahuluan?.prinsip})</div>
-                                    <div>{pengalamanBelajar?.pendahuluan?.deskripsi}</div>
-                                </td>
-                            </tr>
+                            {Array.isArray(pengalamanBelajar) ? (
+                                pengalamanBelajar.map((pertemuan, index) => (
+                                    <React.Fragment key={index}>
+                                        {/* Meeting Header */}
+                                        <tr>
+                                            <td colSpan={3} className="bg-slate-100 font-bold p-2 text-center border-b">
+                                                PERTEMUAN KE-{pertemuan.pertemuanKe || index + 1}
+                                            </td>
+                                        </tr>
 
-                            {/* Inti Header */}
-                            <tr>
-                                <td style={{ width: '20%' }}></td>
-                                <td colSpan={2} style={{ fontWeight: 'bold' }}>INTI</td>
-                            </tr>
+                                        {/* Pendahuluan */}
+                                        <tr>
+                                            <td rowSpan={1} style={{ width: '20%', fontWeight: 'bold', verticalAlign: 'middle', textAlign: 'center' }}>
+                                                PENDAHULUAN<br />
+                                                <span className="text-sm font-normal">({pertemuan.pendahuluan?.waktu || '-'})</span>
+                                            </td>
+                                            <td colSpan={2}>
+                                                <div className="font-bold mb-2">AWAL ({pertemuan.pendahuluan?.prinsip})</div>
+                                                <div>{pertemuan.pendahuluan?.deskripsi}</div>
+                                            </td>
+                                        </tr>
 
-                            {/* Memahami */}
-                            <tr>
-                                <td rowSpan={3}></td>
-                                <td colSpan={2}>
-                                    <div className="font-bold border-b pb-2 mb-2 italic">Memahami ({pengalamanBelajar?.inti?.memahami?.prinsip})</div>
-                                    <ul className="list-decimal pl-5">
-                                        {pengalamanBelajar?.inti?.memahami?.kegiatan?.map((k, i) => (
-                                            <li key={i}>{k.replace(/^\d+\.\s*/, '')}</li>
-                                        ))}
-                                    </ul>
-                                </td>
-                            </tr>
+                                        {/* Inti Header */}
+                                        <tr>
+                                            <td style={{ width: '20%' }}></td>
+                                            <td colSpan={2} style={{ fontWeight: 'bold' }}>INTI</td>
+                                        </tr>
 
-                            {/* Mengaplikasi */}
-                            <tr>
-                                <td colSpan={2}>
-                                    <div className="font-bold border-b pb-2 mb-2 italic">Mengaplikasi ({pengalamanBelajar?.inti?.mengaplikasi?.prinsip})</div>
-                                    <ul className="list-decimal pl-5">
-                                        {pengalamanBelajar?.inti?.mengaplikasi?.kegiatan?.map((k, i) => (
-                                            <li key={i}>{k.replace(/^\d+\.\s*/, '')}</li>
-                                        ))}
-                                    </ul>
-                                </td>
-                            </tr>
+                                        {/* Memahami */}
+                                        <tr>
+                                            <td rowSpan={3} style={{ fontWeight: 'bold', textAlign: 'center', verticalAlign: 'middle' }}>
+                                                INTI<br />
+                                                <span className="text-sm font-normal">({pertemuan.inti?.waktu || '-'})</span>
+                                            </td>
+                                            <td colSpan={2}>
+                                                <div className="font-bold border-b pb-2 mb-2 italic">Memahami ({pertemuan.inti?.memahami?.prinsip})</div>
+                                                <ul className="list-decimal pl-5">
+                                                    {pertemuan.inti?.memahami?.kegiatan?.map((k, i) => (
+                                                        <li key={i}>{typeof k === 'string' ? k.replace(/^\d+\.\s*/, '') : k}</li>
+                                                    ))}
+                                                </ul>
+                                            </td>
+                                        </tr>
 
-                            {/* Merefleksi */}
-                            <tr>
-                                <td colSpan={2}>
-                                    <div className="font-bold border-b pb-2 mb-2 italic">Merefleksi ({pengalamanBelajar?.inti?.merefleksi?.prinsip})</div>
-                                    <ul className="list-decimal pl-5">
-                                        {pengalamanBelajar?.inti?.merefleksi?.kegiatan?.map((k, i) => (
-                                            <li key={i}>{k.replace(/^\d+\.\s*/, '')}</li>
-                                        ))}
-                                    </ul>
-                                </td>
-                            </tr>
+                                        {/* Mengaplikasi */}
+                                        <tr>
+                                            <td colSpan={2}>
+                                                <div className="font-bold border-b pb-2 mb-2 italic">Mengaplikasi ({pertemuan.inti?.mengaplikasi?.prinsip})</div>
+                                                <ul className="list-decimal pl-5">
+                                                    {pertemuan.inti?.mengaplikasi?.kegiatan?.map((k, i) => (
+                                                        <li key={i}>{typeof k === 'string' ? k.replace(/^\d+\.\s*/, '') : k}</li>
+                                                    ))}
+                                                </ul>
+                                            </td>
+                                        </tr>
+
+                                        {/* Merefleksi */}
+                                        <tr>
+                                            <td colSpan={2}>
+                                                <div className="font-bold border-b pb-2 mb-2 italic">Merefleksi ({pertemuan.inti?.merefleksi?.prinsip})</div>
+                                                <ul className="list-decimal pl-5">
+                                                    {pertemuan.inti?.merefleksi?.kegiatan?.map((k, i) => (
+                                                        <li key={i}>{typeof k === 'string' ? k.replace(/^\d+\.\s*/, '') : k}</li>
+                                                    ))}
+                                                </ul>
+                                            </td>
+                                        </tr>
+
+                                        {/* Per-Meeting Penutup */}
+                                        {pertemuan.penutup && (
+                                            <tr>
+                                                <td style={{ fontWeight: 'bold', textAlign: 'center', verticalAlign: 'middle' }}>
+                                                    PENUTUP<br />
+                                                    <span className="text-sm font-normal">({pertemuan.penutup?.waktu || '-'})</span>
+                                                </td>
+                                                <td colSpan={2}>
+                                                    <div className="font-bold mb-1">AKHIR ({pertemuan.penutup.prinsip})</div>
+                                                    <div>{pertemuan.penutup.deskripsi}</div>
+                                                </td>
+                                            </tr>
+                                        )}
+                                    </React.Fragment>
+                                ))
+                            ) : (
+                                // Fallback for legacy single object format
+                                <>
+                                    <tr>
+                                        <td rowSpan={1} style={{ width: '20%', fontWeight: 'bold', verticalAlign: 'middle', textAlign: 'center' }}>
+                                            PENGALAMAN<br />BELAJAR
+                                        </td>
+                                        <td colSpan={2}>
+                                            <div className="font-bold mb-2">AWAL ({pengalamanBelajar?.pendahuluan?.prinsip})</div>
+                                            <div>{pengalamanBelajar?.pendahuluan?.deskripsi}</div>
+                                        </td>
+                                    </tr>
+
+                                    {/* Inti Header */}
+                                    <tr>
+                                        <td style={{ width: '20%' }}></td>
+                                        <td colSpan={2} style={{ fontWeight: 'bold' }}>INTI</td>
+                                    </tr>
+
+                                    {/* Memahami */}
+                                    <tr>
+                                        <td rowSpan={3}></td>
+                                        <td colSpan={2}>
+                                            <div className="font-bold border-b pb-2 mb-2 italic">Memahami ({pengalamanBelajar?.inti?.memahami?.prinsip})</div>
+                                            <ul className="list-decimal pl-5">
+                                                {pengalamanBelajar?.inti?.memahami?.kegiatan?.map((k, i) => (
+                                                    <li key={i}>{k.replace(/^\d+\.\s*/, '')}</li>
+                                                ))}
+                                            </ul>
+                                        </td>
+                                    </tr>
+
+                                    {/* Mengaplikasi */}
+                                    <tr>
+                                        <td colSpan={2}>
+                                            <div className="font-bold border-b pb-2 mb-2 italic">Mengaplikasi ({pengalamanBelajar?.inti?.mengaplikasi?.prinsip})</div>
+                                            <ul className="list-decimal pl-5">
+                                                {pengalamanBelajar?.inti?.mengaplikasi?.kegiatan?.map((k, i) => (
+                                                    <li key={i}>{k.replace(/^\d+\.\s*/, '')}</li>
+                                                ))}
+                                            </ul>
+                                        </td>
+                                    </tr>
+
+                                    {/* Merefleksi */}
+                                    <tr>
+                                        <td colSpan={2}>
+                                            <div className="font-bold border-b pb-2 mb-2 italic">Merefleksi ({pengalamanBelajar?.inti?.merefleksi?.prinsip})</div>
+                                            <ul className="list-decimal pl-5">
+                                                {pengalamanBelajar?.inti?.merefleksi?.kegiatan?.map((k, i) => (
+                                                    <li key={i}>{k.replace(/^\d+\.\s*/, '')}</li>
+                                                ))}
+                                            </ul>
+                                        </td>
+                                    </tr>
+                                </>
+                            )}
                         </tbody>
                     </table>
 
                     {/* Penutup and Asesmen Table */}
                     <table className="modul-table">
                         <tbody>
+                            {/* Header / Penutup / Sidebar Logic */}
+                            {penutup?.deskripsi ? (
+                                // Legacy: Show Penutup Description row with Sidebar spanning 4 rows
+                                <tr>
+                                    <td rowSpan={4} style={{ width: '20%', fontWeight: 'bold', textAlign: 'center', verticalAlign: 'middle' }}>
+                                        ASESMEN<br />PEMBELAJARAN
+                                    </td>
+                                    <td colSpan={2}>
+                                        <div className="font-bold mb-1">PENUTUP ({penutup?.prinsip})</div>
+                                        <div className="text-sm italic mb-2">{penutup?.deskripsi}</div>
+                                    </td>
+                                </tr>
+                            ) : (
+                                // New: Sidebar spans 3 rows (Awal, Proses, Akhir), starts at Asesmen Awal
+                                null
+                            )}
+
+                            {/* Asesmen Awal */}
                             <tr>
-                                <td rowSpan={4} style={{ width: '20%', fontWeight: 'bold', textAlign: 'center', verticalAlign: 'middle' }}>
-                                    ASESMEN<br />PEMBELAJARAN
-                                </td>
-                                <td colSpan={2}>
-                                    <div className="font-bold mb-1">PENUTUP ({penutup?.prinsip})</div>
-                                    <div className="text-sm italic mb-2">{penutup?.deskripsi}</div>
-                                </td>
-                            </tr>
-                            <tr>
+                                {!penutup?.deskripsi && (
+                                    <td rowSpan={4} style={{ width: '20%', fontWeight: 'bold', textAlign: 'center', verticalAlign: 'middle' }}>
+                                        ASESMEN<br />PEMBELAJARAN
+                                    </td>
+                                )}
                                 <td style={{ width: '30%' }}>Asesmen pada Awal Pembelajaran</td>
                                 <td>{penutup?.asesmen?.awal}</td>
                             </tr>

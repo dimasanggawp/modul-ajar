@@ -22,7 +22,7 @@ export const generateModule = async (data) => {
           "mataPelajaran": "${data.subject}",
           "kelas": "${data.grade}",
           "semester": "${data.semester}",
-          "alokasiWaktu": "${data.duration} (${data.meetings} Pertemuan @ ${data.hoursPerMeeting})",
+          "alokasiWaktu": "${parseInt(data.duration) * parseInt(data.hoursPerMeeting) * parseInt(data.meetings)} Menit (${data.hoursPerMeeting} JP x ${data.duration} Menit x ${data.meetings} Pertemuan)",
           "pesertaDidik": "${data.studentCharacteristics || 'Reguler/Tipikal'}",
           "materiPelajaran": "${data.topic}",
           "dimensiProfil": ${JSON.stringify(data.deepLearningDimensions || [])}
@@ -35,39 +35,51 @@ export const generateModule = async (data) => {
            ]
         },
         "desainPembelajaran": {
-           "capaianPembelajaran": "Tuliskan capaian pembelajaran sesuai fase",
+           "capaianPembelajaran": "${data.learningOutcome || '-'}",
            "lintasDisiplin": "${data.crossDisciplinary || '-'}",
-           "tujuanPembelajaran": "${data.objectives || 'Rumuskan kompetensi yang diharapkan...'}",
+           "tujuanPembelajaran": "${data.learningGoals || '-'}",
            "topik": "${data.topic}",
-           "praktikPedagogis": "Model/Strategi/Metode yang ditentukan (misal PjBL/PBL) untuk mencapai tujuan...",
+           "praktikPedagogis": "${data.pedagogicalPractice || '-'}",
            "kemitraan": "${data.partnerships || '-'}",
            "lingkungan": "${data.learningEnvironment || '-'}",
            "digital": "${data.digitalTools || '-'}"
         },
-        "pengalamanBelajar": {
-           "pendahuluan": {
-              "prinsip": "Berkesadaran, Bermakna, Menggembirakan",
-              "deskripsi": "Deskripsi kegiatan pembuka..."
-           },
-           "inti": { 
-             // Inti dibagi menjadi 3 tahap utama Deep Learning
-             "memahami": {
-                "prinsip": "Berkesadaran, Bermakna, Menggembirakan",
-                "kegiatan": ["1. ...", "2. ..."]
-             },
-             "mengaplikasi": {
-                "prinsip": "Berkesadaran, Bermakna, Menggembirakan",
-                "kegiatan": ["1. ...", "2. ..."]
-             },
-             "merefleksi": {
-                "prinsip": "Berkesadaran, Bermakna, Menggembirakan",
-                "kegiatan": ["1. ...", "2. ..."]
+        "pengalamanBelajar": [
+             // Generate an array of objects, one for EACH meeting.
+             // If data.meetings is 2, there must be 2 objects here.
+             {
+               "pertemuanKe": 1,
+               "alokasiWaktu": "${parseInt(data.duration) * parseInt(data.hoursPerMeeting)} Menit",
+               "pendahuluan": {
+                  "waktu": "${Math.round(parseInt(data.duration) * parseInt(data.hoursPerMeeting) * 0.15)} Menit",
+                  "prinsip": "Berkesadaran, Bermakna, Menggembirakan",
+                  "deskripsi": "Deskripsi kegiatan pembuka..."
+               },
+               "inti": { 
+                 "waktu": "${Math.round(parseInt(data.duration) * parseInt(data.hoursPerMeeting) * 0.75)} Menit",
+                 // Inti dibagi menjadi 3 tahap utama Deep Learning
+                 "memahami": {
+                    "prinsip": "Berkesadaran, Bermakna, Menggembirakan",
+                    "kegiatan": ["1. ...", "2. ..."]
+                 },
+                 "mengaplikasi": {
+                    "prinsip": "Berkesadaran, Bermakna, Menggembirakan",
+                    "kegiatan": ["1. ...", "2. ..."]
+                 },
+                 "merefleksi": {
+                    "prinsip": "Berkesadaran, Bermakna, Menggembirakan",
+                    "kegiatan": ["1. ...", "2. ..."]
+                 }
+               },
+               "penutup": {
+                  "waktu": "${Math.round(parseInt(data.duration) * parseInt(data.hoursPerMeeting) * 0.10)} Menit",
+                  "prinsip": "Berkesadaran, Bermakna, Menggembirakan",
+                  "deskripsi": "Refleksi dan penutup..."
+               }
              }
-           }
-        },
+        ],
         "penutup": {
-           "prinsip": "Berkesadaran, Bermakna, Menggembirakan",
-           "deskripsi": "Tahap akhir proses pembelajaran...",
+           // Global closing/assessment info
            "asesmen": {
               "awal": "Asesmen pada Awal Pembelajaran...",
               "proses": "Asesmen pada Proses Pembelajaran...",
@@ -93,6 +105,7 @@ export const generateModule = async (data) => {
       Isi konten dengan detail pendidikan yang sesuai dengan input berikut:
       Topik: ${data.topic}
       Tujuan: ${data.objectives || '-'}
+      Jumlah Pertemuan: ${data.meetings} (Generate UNIQUE activities for EACH meeting)
       Karakteristik Siswa: ${data.studentCharacteristics || '-'}
     `;
 
@@ -134,7 +147,7 @@ export const generateStandardModule = async (data) => {
              "kelas": "${data.grade}",
              "semester": "${data.semester}",
              "materi": "${data.topic}",
-             "alokasiWaktu": "${data.duration}",
+             "alokasiWaktu": "${parseInt(data.duration) * parseInt(data.hoursPerMeeting) * parseInt(data.meetings)} Menit (${data.hoursPerMeeting} JP x ${data.duration} Menit x ${data.meetings} Pertemuan)",
              "jumlahPertemuan": "${data.meetings} Pertemuan",
              "jamPerPertemuan": "${data.hoursPerMeeting}",
              "targetPesertaDidik": "${data.studentCharacteristics || 'Reguler'}"

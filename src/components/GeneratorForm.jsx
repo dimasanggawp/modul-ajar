@@ -173,7 +173,7 @@ const GeneratorForm = ({ onGenerate, isGenerating, initialData }) => {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div className="space-y-2">
                     <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                        <Clock size={16} /> Alokasi Waktu Total
+                        <Clock size={16} /> Waktu per JP (Menit)
                     </label>
                     <input
                         type="text"
@@ -181,7 +181,22 @@ const GeneratorForm = ({ onGenerate, isGenerating, initialData }) => {
                         required
                         value={formData.duration}
                         onChange={handleChange}
-                        placeholder="Contoh: 180 Menit"
+                        placeholder="Contoh: 45 Menit"
+                        className="input-field"
+                    />
+                </div>
+
+                <div className="space-y-2">
+                    <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                        <Clock size={16} /> JP per Pertemuan
+                    </label>
+                    <input
+                        type="number"
+                        name="hoursPerMeeting"
+                        required
+                        value={formData.hoursPerMeeting}
+                        onChange={handleChange}
+                        placeholder="Contoh: 2"
                         className="input-field"
                     />
                 </div>
@@ -202,20 +217,7 @@ const GeneratorForm = ({ onGenerate, isGenerating, initialData }) => {
                     />
                 </div>
 
-                <div className="space-y-2">
-                    <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                        <Clock size={16} /> JP per Pertemuan
-                    </label>
-                    <input
-                        type="text"
-                        name="hoursPerMeeting"
-                        required
-                        value={formData.hoursPerMeeting}
-                        onChange={handleChange}
-                        placeholder="Contoh: 2 JP"
-                        className="input-field"
-                    />
-                </div>
+
             </div>
         </div>
     );
