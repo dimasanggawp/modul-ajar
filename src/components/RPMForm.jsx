@@ -66,7 +66,7 @@ const INITIAL_ASSESSMENT_OPTIONS = [
     }
 ];
 
-const GeneratorForm = ({ onGenerate, isGenerating, initialData }) => {
+const RPMForm = ({ onGenerate, isGenerating, initialData }) => {
     const [step, setStep] = useState(1);
     const [formData, setFormData] = useState(initialData || {
         teacherName: '',
@@ -526,4 +526,4 @@ const GeneratorForm = ({ onGenerate, isGenerating, initialData }) => {
     );
 };
 
-export default GeneratorForm;
+export default RPMForm;

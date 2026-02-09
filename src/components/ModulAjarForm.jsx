@@ -343,7 +343,7 @@ const ModulAjarForm = ({ onGenerate, isGenerating, initialData }) => {
                 </label>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     {PROFIL_PELAJAR_PANCASILA.map((dim, index) => (
-                        <div key={index} className="flex items-center space-x-2 bg-slate-50 p-3 rounded-lg border border-slate-200 hover:border-primary-300 transition-colors">
+                        <div key={index} className="flex items-center space-x-2 bg-slate-50 p-2 rounded-lg border border-slate-200 hover:border-primary-300 transition-colors">
                             <input
                                 type="checkbox"
                                 id={`dim-${index}`}
@@ -353,9 +353,10 @@ const ModulAjarForm = ({ onGenerate, isGenerating, initialData }) => {
                             />
                             <label
                                 htmlFor={`dim-${index}`}
-                                className="text-sm text-slate-700 cursor-pointer select-none flex-1"
+                                className="text-sm text-slate-700 cursor-pointer select-none flex-1 truncate"
+                                title={dim}
                             >
-                                {dim}
+                                <span className="font-medium">{dim}</span>
                             </label>
                         </div>
                     ))}

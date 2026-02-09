@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import GeneratorForm from '../components/GeneratorForm';
-import ModuleDisplay from '../components/ModuleDisplay';
+import RPMForm from '../components/RPMForm';
+import RPMDisplay from '../components/RPMDisplay';
 import { generateModule } from '../lib/groq';
 import { BrainCircuit, ArrowLeft } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
-function DeepLearningGenerator() {
+function RPMGenerator() {
     const [moduleContent, setModuleContent] = useState(null);
     const [isGenerating, setIsGenerating] = useState(false);
     const [error, setError] = useState(null);
@@ -77,9 +77,9 @@ function DeepLearningGenerator() {
                     )}
 
                     {!moduleContent ? (
-                        <GeneratorForm onGenerate={handleGenerate} isGenerating={isGenerating} initialData={savedFormData} />
+                        <RPMForm onGenerate={handleGenerate} isGenerating={isGenerating} initialData={savedFormData} />
                     ) : (
-                        <ModuleDisplay content={moduleContent} onReset={handleReset} onEdit={handleEdit} />
+                        <RPMDisplay content={moduleContent} onReset={handleReset} onEdit={handleEdit} />
                     )}
                 </main>
 
@@ -91,4 +91,4 @@ function DeepLearningGenerator() {
     );
 }
 
-export default DeepLearningGenerator;
+export default RPMGenerator;

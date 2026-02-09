@@ -5,7 +5,7 @@ import html2pdf from 'html2pdf.js';
 import { asBlob } from 'html-docx-js-typescript';
 import { saveAs } from 'file-saver';
 
-const ModuleDisplay = ({ content, onReset, onEdit }) => {
+const RPMDisplay = ({ content, onReset, onEdit }) => {
     const contentRef = useRef(null);
     const [isDownloading, setIsDownloading] = useState(false);
 
@@ -731,4 +731,4 @@ const ModuleDisplay = ({ content, onReset, onEdit }) => {
     );
 };
 
-export default ModuleDisplay;
+export default RPMDisplay;

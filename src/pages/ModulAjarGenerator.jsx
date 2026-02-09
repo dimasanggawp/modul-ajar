@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import ModulAjarForm from '../components/ModulAjarForm';
-import StandardModuleDisplay from '../components/StandardModuleDisplay';
+import ModulAjarDisplay from '../components/ModulAjarDisplay';
 import { generateStandardModule } from '../lib/groq';
 import { BookOpen, ArrowLeft } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -86,7 +86,7 @@ function ModulAjarGenerator() {
                     {!moduleContent ? (
                         <ModulAjarForm onGenerate={handleGenerate} isGenerating={isGenerating} initialData={savedFormData} />
                     ) : (
-                        <StandardModuleDisplay content={moduleContent} onReset={handleReset} onEdit={handleEdit} />
+                        <ModulAjarDisplay content={moduleContent} onReset={handleReset} onEdit={handleEdit} />
                     )}
                 </main>
 

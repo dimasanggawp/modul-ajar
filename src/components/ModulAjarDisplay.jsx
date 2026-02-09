@@ -17,7 +17,7 @@ class ErrorBoundary extends Component {
     }
 
     componentDidCatch(error, errorInfo) {
-        console.error("StandardModuleDisplay Validation Error:", error, errorInfo);
+        console.error("ModulAjarDisplay Validation Error:", error, errorInfo);
     }
 
     render() {
@@ -279,11 +279,11 @@ const ModuleView = ({ content, onReset, onEdit }) => {
 
 
 
-                {/* Profil Pelajar Pancasila */}
+                {/* Dimensi Profil Lulusan */}
                 <table className="w-full border-collapse border border-black mb-6">
                     <thead>
                         <tr>
-                            <th colSpan="2" className="border border-black p-2 bg-blue-200 text-center font-bold blue-header">PROFIL PELAJAR PANCASILA</th>
+                            <th colSpan="2" className="border border-black p-2 bg-blue-200 text-center font-bold blue-header">DIMENSI PROFIL LULUSAN</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -610,10 +610,10 @@ const ModuleView = ({ content, onReset, onEdit }) => {
 };
 
 // Export wrapped with ErrorBoundary
-const StandardModuleDisplay = (props) => (
+const ModulAjarDisplay = (props) => (
     <ErrorBoundary onReset={props.onReset}>
         <ModuleView {...props} />
     </ErrorBoundary>
 );
 
-export default StandardModuleDisplay;
+export default ModulAjarDisplay;
