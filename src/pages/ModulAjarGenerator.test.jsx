@@ -20,6 +20,12 @@ vi.mock('../components/ModulAjarDisplay', () => ({
     ),
 }));
 
+// Mock lucide-react
+vi.mock('lucide-react', () => ({
+    BookOpen: () => <div data-testid="book-open-icon" />,
+    ArrowLeft: () => <div data-testid="arrow-left-icon" />,
+}));
+
 // Mock API call
 vi.mock('../lib/groq', () => ({
     generateStandardModule: vi.fn(),
@@ -36,7 +42,7 @@ describe('ModulAjarGenerator', () => {
                 <ModulAjarGenerator />
             </BrowserRouter>
         );
-        expect(screen.getByText(/Generator Modul Ajar/i)).toBeInTheDocument();
+        expect(screen.getByTestId('page-title')).toHaveTextContent(/Generator Modul Ajar/i);
         expect(screen.getByText('Generate Module')).toBeInTheDocument();
     });
 
@@ -50,7 +56,8 @@ describe('ModulAjarGenerator', () => {
             </BrowserRouter>
         );
 
-        screen.getByText('Generate Module').click();
+        const button = screen.getByText('Generate Module');
+        button.click();
 
         await waitFor(() => {
             expect(screen.getByTestId('module-content')).toHaveTextContent(JSON.stringify(mockContent));
@@ -67,7 +74,8 @@ describe('ModulAjarGenerator', () => {
             </BrowserRouter>
         );
 
-        screen.getByText('Generate Module').click();
+        const button = screen.getByText('Generate Module');
+        button.click();
 
         await waitFor(() => {
             expect(screen.getByText(/Gagal membuat modul ajar/i)).toBeInTheDocument();

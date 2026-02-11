@@ -377,6 +377,7 @@ export const generateStandardModule = async (data) => {
        Karakteristik Siswa: ${data.studentCharacteristics || '-'}
      `;
 
+      const startTime = performance.now();
       const completion = await groq.chat.completions.create({
          messages: [
             {
@@ -389,6 +390,10 @@ export const generateStandardModule = async (data) => {
          max_tokens: 8192,
          response_format: { type: "json_object" }
       });
+
+      const endTime = performance.now();
+      const duration = (endTime - startTime).toFixed(2);
+      console.log(`Module generation took ${duration}ms`);
 
       return completion.choices[0]?.message?.content || "Gagal membuat modul.";
    } catch (error) {

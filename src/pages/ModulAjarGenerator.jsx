@@ -71,7 +71,7 @@ function ModulAjarGenerator() {
                     <div className="bg-white p-2 rounded-xl shadow-lg text-emerald-600">
                         <BookOpen size={32} />
                     </div>
-                    <h1 className="text-2xl md:text-3xl font-bold text-slate-800 tracking-tight">
+                    <h1 data-testid="page-title" className="text-2xl md:text-3xl font-bold text-slate-800 tracking-tight">
                         Generator Modul Ajar
                     </h1>
                 </header>
