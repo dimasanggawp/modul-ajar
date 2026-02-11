@@ -11,12 +11,14 @@ const PEDAGOGICAL_PRACTICES = [
 ];
 
 const PROFIL_PELAJAR_PANCASILA = [
-    "Beriman, bertakwa kepada Tuhan YME, dan berakhlak mulia",
-    "Berkebinekaan global",
-    "Bergotong royong",
-    "Mandiri",
-    "Bernalar kritis",
-    "Kreatif"
+    { label: "Keimanan dan Ketakwaan terhadap Tuhan YME" },
+    { label: "Kewargaan" },
+    { label: "Penalaran Kritis" },
+    { label: "Kreativitas" },
+    { label: "Kolaborasi" },
+    { label: "Kemandirian" },
+    { label: "Kesehatan" },
+    { label: "Komunikasi" }
 ];
 
 const INITIAL_ASSESSMENT_OPTIONS = [
@@ -347,16 +349,17 @@ const ModulAjarForm = ({ onGenerate, isGenerating, initialData }) => {
                             <input
                                 type="checkbox"
                                 id={`dim-${index}`}
-                                checked={formData.profilPelajarPancasila.includes(dim)}
-                                onChange={() => handleDimensionChange(dim)}
+                                checked={formData.profilPelajarPancasila.includes(dim.label)}
+                                onChange={() => handleDimensionChange(dim.label)}
                                 className="w-4 h-4 text-primary-600 rounded border-slate-300 focus:ring-primary-500 cursor-pointer"
                             />
                             <label
                                 htmlFor={`dim-${index}`}
-                                className="text-sm text-slate-700 cursor-pointer select-none flex-1 truncate"
-                                title={dim}
+                                className="text-sm cursor-pointer select-none flex-1 truncate"
+                                title={dim.description || dim.label}
                             >
-                                <span className="font-medium">{dim}</span>
+                                <span className="font-medium text-slate-700">{dim.label}</span>
+                                <span className="text-xs text-slate-500 block truncate">{dim.description}</span>
                             </label>
                         </div>
                     ))}

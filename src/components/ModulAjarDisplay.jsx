@@ -165,10 +165,14 @@ const ModuleView = ({ content, onReset, onEdit }) => {
     // Helper to safely render lists
     const renderList = (items) => {
         if (Array.isArray(items)) {
-            return items.map((item, i) => <li key={i}>{item}</li>);
+            return items.map((item, i) => {
+                const cleanItem = typeof item === 'string' ? item.replace(/^\d+[\.\)]\s*/, '') : item;
+                return <li key={i}>{cleanItem}</li>;
+            });
         }
         if (typeof items === 'string') {
-            return <li>{items}</li>;
+            const cleanItem = items.replace(/^\d+[\.\)]\s*/, '');
+            return <li>{cleanItem}</li>;
         }
         return <li>-</li>;
     };
@@ -415,7 +419,7 @@ const ModuleView = ({ content, onReset, onEdit }) => {
                 <table className="w-full border-collapse border border-black mb-6">
                     <thead>
                         <tr>
-                            <th colSpan="2" className="border border-black p-2 bg-blue-200 text-center font-bold blue-header">SARANA DAN PRASARANA</th>
+                            <th colSpan="2" className="border border-black p-2 bg-blue-200 text-center font-bold blue-header">MODEL PEMBELAJARAN</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -476,55 +480,117 @@ const ModuleView = ({ content, onReset, onEdit }) => {
                                 </ul>
                             </td>
                         </tr>
+                        <tr>
+                            <td className="border border-black p-2 font-bold">Pemahaman Bermakna</td>
+                            <td className="border border-black p-2 text-justify">{kompetensiInti?.pemahamanBermakna || '-'}</td>
+                        </tr>
+                        <tr>
+                            <td className="border border-black p-2 font-bold">Pertanyaan Pemantik</td>
+                            <td className="border border-black p-2 text-justify">
+                                <ul className="list-disc pl-5">
+                                    {renderList(kompetensiInti?.pertanyaanPemantik)}
+                                </ul>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td className="border border-black p-2 font-bold">Persiapan Pembelajaran</td>
+                            <td className="border border-black p-2 text-justify">
+                                <ol className="list-decimal pl-5">
+                                    {renderList(kompetensiInti?.persiapanPembelajaran)}
+                                </ol>
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
 
-                {/* Pemahaman Bermakna & Pertanyaan Pemantik (Moved out of deleted table) */}
-                <div className="mb-6 space-y-4">
-                    <div>
-                        <h4 className="font-bold underline mb-1">Pemahaman Bermakna:</h4>
-                        <p>{kompetensiInti?.pemahamanBermakna || '-'}</p>
-                    </div>
-                    <div>
-                        <h4 className="font-bold underline mb-1">Pertanyaan Pemantik:</h4>
-                        <ul className="list-disc pl-5">
-                            {renderList(kompetensiInti?.pertanyaanPemantik)}
-                        </ul>
-                    </div>
-                </div>
+                {/* C. KEGIATAN PEMBELAJARAN */}
+                <h3 className="font-bold text-lg mb-4">C. KEGIATAN PEMBELAJARAN</h3>
 
-                {/* Kegiatan Pembelajaran */}
-                <table className="w-full border-collapse border border-black mb-6">
-                    <thead>
-                        <tr>
-                            <th colSpan="3" className="border border-black p-2 bg-blue-200 text-center font-bold blue-header">KEGIATAN PEMBELAJARAN</th>
-                        </tr>
-                        <tr>
-                            <th className="border border-black p-2 bg-slate-100 text-center font-bold" style={{ width: '20%' }}>Tahap</th>
-                            <th className="border border-black p-2 bg-slate-100 text-center font-bold">Kegiatan</th>
-                            <th className="border border-black p-2 bg-slate-100 text-center font-bold" style={{ width: '15%' }}>Waktu</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {Array.isArray(kompetensiInti?.kegiatanPembelajaran) && kompetensiInti.kegiatanPembelajaran.length > 0 ? (
-                            kompetensiInti.kegiatanPembelajaran.map((kp, idx) => (
-                                <tr key={idx}>
-                                    <td className="border border-black p-2 font-bold text-center">{kp?.tahap || '-'}</td>
-                                    <td className="border border-black p-2">
-                                        <ul className="list-disc pl-5">
-                                            {renderList(kp?.kegiatan)}
-                                        </ul>
-                                    </td>
-                                    <td className="border border-black p-2 text-center">{kp?.waktu || '-'}</td>
-                                </tr>
-                            ))
-                        ) : (
+                {Array.isArray(kompetensiInti?.rincianKegiatanPembelajaran) && kompetensiInti.rincianKegiatanPembelajaran.length > 0 ? (
+                    kompetensiInti.rincianKegiatanPembelajaran.map((pertemuan, idx) => (
+                        <div key={idx} className="mb-8 border border-black p-4 rounded-sm">
+                            <h4 className="font-bold text-center mb-4 bg-slate-200 p-2 border border-black">PERTEMUAN KE-{pertemuan.pertemuanKe}</h4>
+
+                            {/* Pendahuluan */}
+                            <div className="mb-4 border border-black">
+                                <div className="bg-blue-200 p-2 font-bold border-b border-black text-center blue-header">
+                                    Kegiatan Pendahuluan ({pertemuan.pendahuluan?.durasi || '15 Menit'})
+                                </div>
+                                <div className="p-4">
+                                    <ul className="list-decimal pl-5">
+                                        {renderList(pertemuan.pendahuluan?.deskripsi)}
+                                    </ul>
+                                </div>
+                            </div>
+
+                            {/* Inti */}
+                            <div className="mb-4 border border-black">
+                                <div className="bg-blue-200 p-2 font-bold border-b border-black text-center blue-header">
+                                    Kegiatan Inti ({pertemuan.inti?.durasi || (Array.isArray(pertemuan.inti) ? '60 Menit' : '-')})
+                                </div>
+                                <table className="w-full border-collapse">
+                                    <tbody>
+                                        {(pertemuan.inti?.tahapan || (Array.isArray(pertemuan.inti) ? pertemuan.inti : [])).map((tahap, tIdx) => (
+                                            <tr key={tIdx}>
+                                                <td className="border border-black p-2 font-bold w-[30%] align-top bg-slate-50">
+                                                    {tahap.tahap}
+                                                </td>
+                                                <td className="border border-black p-2">
+                                                    <ul className="list-disc pl-5">
+                                                        {renderList(tahap.deskripsi)}
+                                                    </ul>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            {/* Penutup */}
+                            <div className="border border-black">
+                                <div className="bg-blue-200 p-2 font-bold border-b border-black text-center blue-header">
+                                    Kegiatan Penutup ({pertemuan.penutup?.durasi || '15 Menit'})
+                                </div>
+                                <div className="p-4">
+                                    <ul className="list-decimal pl-5">
+                                        {renderList(pertemuan.penutup?.deskripsi)}
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    ))
+                ) : (
+                    // Fallback for legacy format or content not yet generated
+                    <table className="w-full border-collapse border border-black mb-6">
+                        <thead>
                             <tr>
-                                <td colSpan="3" className="text-center p-4">Tidak ada data kegiatan pembelajaran.</td>
+                                <th colSpan="3" className="border border-black p-2 bg-blue-200 text-center font-bold blue-header">KEGIATAN PEMBELAJARAN (DATA LAMA)</th>
                             </tr>
-                        )}
-                    </tbody>
-                </table>
+                            <tr>
+                                <th className="border border-black p-2 bg-slate-100 text-center font-bold" style={{ width: '20%' }}>Tahap</th>
+                                <th className="border border-black p-2 bg-slate-100 text-center font-bold">Kegiatan</th>
+                                <th className="border border-black p-2 bg-slate-100 text-center font-bold" style={{ width: '15%' }}>Waktu</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {Array.isArray(kompetensiInti?.kegiatanPembelajaran) ? (
+                                kompetensiInti.kegiatanPembelajaran.map((kp, idx) => (
+                                    <tr key={idx}>
+                                        <td className="border border-black p-2 font-bold text-center">{kp?.tahap || '-'}</td>
+                                        <td className="border border-black p-2">
+                                            <ul className="list-disc pl-5">
+                                                {renderList(kp?.kegiatan)}
+                                            </ul>
+                                        </td>
+                                        <td className="border border-black p-2 text-center">{kp?.waktu || '-'}</td>
+                                    </tr>
+                                ))
+                            ) : (
+                                <tr><td colSpan="3" className="p-2 text-center">Data kegiatan pembelajaran tidak tersedia.</td></tr>
+                            )}
+                        </tbody>
+                    </table>
+                )}
 
                 {/* Asesmen */}
                 <table className="w-full border-collapse border border-black mb-6">
@@ -546,7 +612,11 @@ const ModuleView = ({ content, onReset, onEdit }) => {
                                             <li><strong>Jenis:</strong> {Array.isArray(kompetensiInti.asesmen.jenis) ? kompetensiInti.asesmen.jenis.join(', ') : (kompetensiInti.asesmen.jenis || '-')}</li>
                                             <li><strong>Teknik:</strong> {kompetensiInti.asesmen.teknik || '-'}</li>
                                             {kompetensiInti.asesmen.instrumen && <li><strong>Instrumen:</strong> {kompetensiInti.asesmen.instrumen}</li>}
-                                            {kompetensiInti.asesmen.awal && <li><strong>Asesmen Awal:</strong> {kompetensiInti.asesmen.awal}</li>}
+                                            {kompetensiInti.asesmen.awal && (
+                                                <li>
+                                                    <strong>Asesmen Awal:</strong> {typeof kompetensiInti.asesmen.awal === 'object' ? kompetensiInti.asesmen.awal.teknik : kompetensiInti.asesmen.awal}
+                                                </li>
+                                            )}
                                         </>
                                     ) : (
                                         <li>-</li>
@@ -557,8 +627,72 @@ const ModuleView = ({ content, onReset, onEdit }) => {
                     </tbody>
                 </table>
 
-                {/* C. LAMPIRAN */}
-                <h3 className="font-bold text-lg mb-4">C. LAMPIRAN</h3>
+                {/* D. ASESMEN DIAGNOSTIK AWAL */}
+                <h3 className="font-bold text-lg mb-4">D. ASESMEN DIAGNOSTIK AWAL</h3>
+
+                {typeof kompetensiInti?.asesmen?.awal === 'object' ? (
+                    <table className="w-full border-collapse border border-black mb-6">
+                        <thead>
+                            <tr>
+                                <th colSpan="2" className="border border-black p-2 bg-blue-200 text-center font-bold blue-header">
+                                    DETAIL ASESMEN DIAGNOSTIK
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td className="border border-black p-2 font-bold w-[30%]">Keterangan Penilaian</td>
+                                <td className="border border-black p-2">{kompetensiInti.asesmen.awal.keteranganPenilaian || '-'}</td>
+                            </tr>
+                            <tr>
+                                <td className="border border-black p-2 font-bold">Teknik Asesmen</td>
+                                <td className="border border-black p-2">{kompetensiInti.asesmen.awal.teknik || '-'}</td>
+                            </tr>
+                            <tr>
+                                <td className="border border-black p-2 font-bold">Bentuk Instrumen</td>
+                                <td className="border border-black p-2">{kompetensiInti.asesmen.awal.bentukInstrumen || '-'}</td>
+                            </tr>
+                            <tr>
+                                <td className="border border-black p-2 font-bold align-top">Instrumen</td>
+                                <td className="border border-black p-2">
+                                    <ul className="list-decimal pl-5">
+                                        {renderList(kompetensiInti.asesmen.awal.instrumen)}
+                                    </ul>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td className="border border-black p-2 font-bold align-top">Pedoman / Rubrik</td>
+                                <td className="border border-black p-2">{kompetensiInti.asesmen.awal.pedoman || '-'}</td>
+                            </tr>
+                            <tr>
+                                <td className="border border-black p-2 font-bold">Waktu Pelaksanaan</td>
+                                <td className="border border-black p-2">{kompetensiInti.asesmen.awal.waktuPelaksanaan || '-'}</td>
+                            </tr>
+                            <tr>
+                                <td className="border border-black p-2 font-bold align-top">Keterangan</td>
+                                <td className="border border-black p-2">{kompetensiInti.asesmen.awal.keterangan || '-'}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                ) : (
+                    <table className="w-full border-collapse border border-black mb-6">
+                        <thead>
+                            <tr>
+                                <th className="border border-black p-2 bg-blue-200 text-center font-bold blue-header">ASESMEN DIAGNOSTIK AWAL</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td className="border border-black p-2 text-justify">
+                                    {kompetensiInti?.asesmen?.awal || '-'}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                )}
+
+                {/* E. LAMPIRAN */}
+                <h3 className="font-bold text-lg mb-4">E. LAMPIRAN</h3>
                 <div className="border border-black p-4">
                     <h4 className="font-bold underline mb-2">1. Materi Ajar / Bahan Bacaan</h4>
                     <div className="prose max-w-none mb-6">

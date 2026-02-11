@@ -462,7 +462,7 @@ const RPMForm = ({ onGenerate, isGenerating, initialData }) => {
                     <Sparkles size={32} />
                 </div>
                 <h2 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary-700 to-primary-500">
-                    Buat Modul Ajar
+                    Buat Rencana Pembelajaran Mendalam
                 </h2>
                 <div className="flex items-center justify-center gap-2 mt-2">
                     <span className={`text-xs font-bold px-2 py-1 rounded-full ${step >= 1 ? 'bg-primary-100 text-primary-700' : 'bg-slate-100 text-slate-400'}`}>1. Info Dasar</span>
