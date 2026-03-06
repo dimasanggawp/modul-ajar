@@ -5,6 +5,9 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
   base: './',
+  build: {
+    assetsInlineLimit: 500000
+  },
   test: {
     globals: true,
     environment: 'jsdom',

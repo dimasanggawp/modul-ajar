@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { BrainCircuit, BookOpen } from 'lucide-react';
+import LogoSekolah from '../assets/logo-sekolah.png';
 
 const Dashboard = () => {
     const apps = [
@@ -29,9 +30,12 @@ const Dashboard = () => {
 
             <div className="container mx-auto px-4 py-12 relative z-10">
                 <header className="mb-16 text-center">
+                    <div className="flex justify-center mb-6">
+                        <img src={LogoSekolah} alt="Logo SMK Kartanegara Wates" className="h-32 w-auto drop-shadow-md" />
+                    </div>
                     <h1 className="text-4xl font-bold text-slate-800 mb-4 tracking-tight">Dashboard Aplikasi</h1>
                     <p className="text-slate-600 text-lg max-w-2xl mx-auto">
-                        Pusat akses untuk berbagai alat bantu pendidikan dan pembelajaran.
+                        Pusat akses untuk berbagai alat bantu pendidikan dan pembelajaran SMK Kartanegara Wates
                     </p>
                 </header>
 

@@ -4,6 +4,7 @@ import { Download, Copy, ArrowLeft, Printer, FileText, FileDown } from 'lucide-r
 import html2pdf from 'html2pdf.js';
 import { asBlob } from 'html-docx-js-typescript';
 import { saveAs } from 'file-saver';
+import logoKop from '../assets/logo-kop.png';
 
 const RPMDisplay = ({ content, onReset, onEdit }) => {
     const contentRef = useRef(null);
@@ -34,24 +35,44 @@ const RPMDisplay = ({ content, onReset, onEdit }) => {
     };
 
     const getBase64FromUrl = async (url) => {
-        const data = await fetch(url);
-        const blob = await data.blob();
-        return new Promise((resolve) => {
-            const reader = new FileReader();
-            reader.readAsDataURL(blob);
-            reader.onloadend = () => {
-                const base64data = reader.result;
+        if (typeof url === 'string' && url.startsWith('data:')) {
+            return new Promise((resolve) => {
                 const img = new Image();
                 img.onload = () => {
                     resolve({
-                        base64: base64data,
+                        base64: url,
                         width: img.width,
                         height: img.height
                     });
                 };
-                img.src = base64data;
-            };
-        });
+                img.onerror = () => resolve(null);
+                img.src = url;
+            });
+        }
+
+        try {
+            const data = await fetch(url);
+            const blob = await data.blob();
+            return new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(blob);
+                reader.onloadend = () => {
+                    const base64data = reader.result;
+                    const img = new Image();
+                    img.onload = () => {
+                        resolve({
+                            base64: base64data,
+                            width: img.width,
+                            height: img.height
+                        });
+                    };
+                    img.src = base64data;
+                };
+            });
+        } catch (e) {
+            console.error("Error fetching URL:", e);
+            throw e;
+        }
     };
 
 
@@ -71,7 +92,7 @@ const RPMDisplay = ({ content, onReset, onEdit }) => {
         try {
             let imgInfo = null;
             try {
-                imgInfo = await getBase64FromUrl('/logo%20dan%20kop.png');
+                imgInfo = await getBase64FromUrl(logoKop);
             } catch (imgError) {
                 console.warn('Gagal memuat gambar kop:', imgError);
             }
@@ -115,7 +136,7 @@ const RPMDisplay = ({ content, onReset, onEdit }) => {
         try {
             let imgInfo = null;
             try {
-                imgInfo = await getBase64FromUrl('/logo%20dan%20kop.png');
+                imgInfo = await getBase64FromUrl(logoKop);
             } catch (imgError) {
                 console.warn('Gagal memuat gambar kop:', imgError);
             }
@@ -164,6 +185,15 @@ const RPMDisplay = ({ content, onReset, onEdit }) => {
                 table.querySelectorAll('td').forEach(td => {
                     td.style.border = 'none';
                 });
+            });
+
+            // Fix title alignment for Word
+            const titles = tempDiv.querySelectorAll('h3, .text-center');
+            titles.forEach(el => {
+                if (el.classList.contains('text-center') || el.style.textAlign === 'center') {
+                    el.setAttribute('align', 'center');
+                    el.style.textAlign = 'center';
+                }
             });
 
             const htmlContent = `
@@ -277,7 +307,7 @@ const RPMDisplay = ({ content, onReset, onEdit }) => {
 
                     <div id="screen-kop" className="mb-8">
                         <img
-                            src="/logo%20dan%20kop.png"
+                            src={logoKop}
                             alt="Kop Surat"
                             className="w-full h-auto"
                         />
@@ -285,7 +315,7 @@ const RPMDisplay = ({ content, onReset, onEdit }) => {
 
                     {/* Header Section */}
                     <div className="mb-6">
-                        <h3 className="uppercase font-bold mb-4" style={{ fontSize: '11pt' }}>RENCANA PEMBELAJARAN MENDALAM</h3>
+                        <h3 className="uppercase font-bold mb-4 text-center" style={{ fontSize: '11pt', textAlign: 'center' }}>RENCANA PEMBELAJARAN MENDALAM</h3>
                         <table className="no-border-table mb-4" style={{ maxWidth: '600px' }}>
                             <tbody>
                                 <tr><td style={{ width: '200px' }}>SEKOLAH</td><td>: {informasiUmum?.sekolah}</td></tr>
@@ -306,7 +336,7 @@ const RPMDisplay = ({ content, onReset, onEdit }) => {
                                 </td>
                                 <td style={{ width: '25%', fontWeight: 'bold' }}>Peserta Didik</td>
                                 <td colSpan={2}>
-                                    <div><strong>{informasiUmum?.pesertaDidik}</strong></div>
+                                    <div className="text-justify"><strong>{informasiUmum?.pesertaDidik}</strong></div>
                                 </td>
                             </tr>
                             <tr>
@@ -367,31 +397,38 @@ const RPMDisplay = ({ content, onReset, onEdit }) => {
                                     DESAIN<br />PEMBELAJARAN
                                 </td>
                                 <td style={{ width: '25%', fontWeight: 'bold' }}>Capaian Pembelajaran</td>
-                                <td>{desainPembelajaran?.capaianPembelajaran}</td>
+                                <td className="text-justify">{desainPembelajaran?.capaianPembelajaran}</td>
                             </tr>
                             <tr>
                                 <td style={{ fontWeight: 'bold' }}>Lintas Disiplin Ilmu</td>
-                                <td>{desainPembelajaran?.lintasDisiplin}</td>
+                                <td className="text-justify">{desainPembelajaran?.lintasDisiplin}</td>
                             </tr>
                             <tr>
                                 <td style={{ fontWeight: 'bold' }}>Tujuan Pembelajaran</td>
                                 <td>
                                     {(() => {
-                                        const text = desainPembelajaran?.tujuanPembelajaran || '-';
-                                        // Split by newlines or numbered lists (e.g. "1. ", "2. ")
-                                        // The regex /(?=\d+\.)/ uses lookahead to split BEFORE the number, keeping the number.
-                                        const parts = text.split(/(?:\r\n|\r|\n)|(?=\d+\.\s)/).filter(Boolean);
+                                        const content = desainPembelajaran?.tujuanPembelajaran;
+                                        if (!content) return '-';
+
+                                        let parts = [];
+                                        if (Array.isArray(content)) {
+                                            parts = content;
+                                        } else if (typeof content === 'string') {
+                                            parts = content.split(/(?:\r\n|\r|\n)|(?=\d+\.\s)/).filter(Boolean);
+                                        } else {
+                                            return '-';
+                                        }
 
                                         if (parts.length === 0) return '-';
 
                                         return (
-                                            <div className="space-y-1">
+                                            <ol className="list-decimal pl-5 space-y-1">
                                                 {parts.map((part, idx) => (
-                                                    <div key={idx} className="leading-relaxed">
-                                                        {part.trim()}
-                                                    </div>
+                                                    <li key={idx} className="leading-relaxed text-justify">
+                                                        {part.replace(/^\d+\.\s*/, '').trim()}
+                                                    </li>
                                                 ))}
-                                            </div>
+                                            </ol>
                                         );
                                     })()}
                                 </td>
@@ -402,19 +439,19 @@ const RPMDisplay = ({ content, onReset, onEdit }) => {
                             </tr>
                             <tr>
                                 <td style={{ fontWeight: 'bold' }}>Praktik Pedagogis</td>
-                                <td>{desainPembelajaran?.praktikPedagogis}</td>
+                                <td className="text-justify">{desainPembelajaran?.praktikPedagogis}</td>
                             </tr>
                             <tr>
                                 <td style={{ fontWeight: 'bold' }}>Kemitraan Pembelajaran</td>
-                                <td>{desainPembelajaran?.kemitraan}</td>
+                                <td className="text-justify">{desainPembelajaran?.kemitraan}</td>
                             </tr>
                             <tr>
                                 <td style={{ fontWeight: 'bold' }}>Lingkungan Pembelajaran</td>
-                                <td>{desainPembelajaran?.lingkungan}</td>
+                                <td className="text-justify">{desainPembelajaran?.lingkungan}</td>
                             </tr>
                             <tr>
                                 <td style={{ fontWeight: 'bold' }}>Pemanfaatan Digital</td>
-                                <td>{desainPembelajaran?.digital}</td>
+                                <td className="text-justify">{desainPembelajaran?.digital}</td>
                             </tr>
                         </tbody>
                     </table>
@@ -452,7 +489,7 @@ const RPMDisplay = ({ content, onReset, onEdit }) => {
                                                     <li>Guru melakukan apersepsi terkait materi.</li>
                                                     <li>Guru menyampaikan tujuan pembelajaran.</li>
                                                 </ul>
-                                                <div>{pertemuan.pendahuluan?.deskripsi}</div>
+                                                <div className="text-justify">{pertemuan.pendahuluan?.deskripsi}</div>
                                             </td>
                                         </tr>
 
@@ -471,9 +508,17 @@ const RPMDisplay = ({ content, onReset, onEdit }) => {
                                             <td colSpan={2}>
                                                 <div className="font-bold border-b pb-2 mb-2 italic">Memahami ({pertemuan.inti?.memahami?.prinsip})</div>
                                                 <ul className="list-decimal pl-5">
-                                                    {pertemuan.inti?.memahami?.kegiatan?.map((k, i) => (
-                                                        <li key={i}>{typeof k === 'string' ? k.replace(/^\d+\.\s*/, '') : k}</li>
-                                                    ))}
+                                                    {(() => {
+                                                        const kegiatan = pertemuan.inti?.memahami?.kegiatan;
+                                                        if (Array.isArray(kegiatan)) {
+                                                            return kegiatan.map((k, i) => (
+                                                                <li key={i} className="text-justify">{typeof k === 'string' ? k.replace(/^\d+\.\s*/, '') : k}</li>
+                                                            ));
+                                                        } else if (typeof kegiatan === 'string') {
+                                                            return <li className="text-justify">{kegiatan}</li>;
+                                                        }
+                                                        return null;
+                                                    })()}
                                                 </ul>
                                             </td>
                                         </tr>
@@ -483,9 +528,17 @@ const RPMDisplay = ({ content, onReset, onEdit }) => {
                                             <td colSpan={2}>
                                                 <div className="font-bold border-b pb-2 mb-2 italic">Mengaplikasi ({pertemuan.inti?.mengaplikasi?.prinsip})</div>
                                                 <ul className="list-decimal pl-5">
-                                                    {pertemuan.inti?.mengaplikasi?.kegiatan?.map((k, i) => (
-                                                        <li key={i}>{typeof k === 'string' ? k.replace(/^\d+\.\s*/, '') : k}</li>
-                                                    ))}
+                                                    {(() => {
+                                                        const kegiatan = pertemuan.inti?.mengaplikasi?.kegiatan;
+                                                        if (Array.isArray(kegiatan)) {
+                                                            return kegiatan.map((k, i) => (
+                                                                <li key={i} className="text-justify">{typeof k === 'string' ? k.replace(/^\d+\.\s*/, '') : k}</li>
+                                                            ));
+                                                        } else if (typeof kegiatan === 'string') {
+                                                            return <li className="text-justify">{kegiatan}</li>;
+                                                        }
+                                                        return null;
+                                                    })()}
                                                 </ul>
                                             </td>
                                         </tr>
@@ -495,9 +548,17 @@ const RPMDisplay = ({ content, onReset, onEdit }) => {
                                             <td colSpan={2}>
                                                 <div className="font-bold border-b pb-2 mb-2 italic">Merefleksi ({pertemuan.inti?.merefleksi?.prinsip})</div>
                                                 <ul className="list-decimal pl-5">
-                                                    {pertemuan.inti?.merefleksi?.kegiatan?.map((k, i) => (
-                                                        <li key={i}>{typeof k === 'string' ? k.replace(/^\d+\.\s*/, '') : k}</li>
-                                                    ))}
+                                                    {(() => {
+                                                        const kegiatan = pertemuan.inti?.merefleksi?.kegiatan;
+                                                        if (Array.isArray(kegiatan)) {
+                                                            return kegiatan.map((k, i) => (
+                                                                <li key={i} className="text-justify">{typeof k === 'string' ? k.replace(/^\d+\.\s*/, '') : k}</li>
+                                                            ));
+                                                        } else if (typeof kegiatan === 'string') {
+                                                            return <li className="text-justify">{kegiatan}</li>;
+                                                        }
+                                                        return null;
+                                                    })()}
                                                 </ul>
                                             </td>
                                         </tr>
@@ -511,7 +572,7 @@ const RPMDisplay = ({ content, onReset, onEdit }) => {
                                                 </td>
                                                 <td colSpan={2}>
                                                     <div className="font-bold mb-1">AKHIR ({pertemuan.penutup.prinsip})</div>
-                                                    <div>{pertemuan.penutup.deskripsi}</div>
+                                                    <div className="text-justify">{pertemuan.penutup.deskripsi}</div>
                                                 </td>
                                             </tr>
                                         )}
@@ -526,7 +587,7 @@ const RPMDisplay = ({ content, onReset, onEdit }) => {
                                         </td>
                                         <td colSpan={2}>
                                             <div className="font-bold mb-2">AWAL ({pengalamanBelajar?.pendahuluan?.prinsip})</div>
-                                            <div>{pengalamanBelajar?.pendahuluan?.deskripsi}</div>
+                                            <div className="text-justify">{pengalamanBelajar?.pendahuluan?.deskripsi}</div>
                                         </td>
                                     </tr>
 
@@ -543,7 +604,7 @@ const RPMDisplay = ({ content, onReset, onEdit }) => {
                                             <div className="font-bold border-b pb-2 mb-2 italic">Memahami ({pengalamanBelajar?.inti?.memahami?.prinsip})</div>
                                             <ul className="list-decimal pl-5">
                                                 {pengalamanBelajar?.inti?.memahami?.kegiatan?.map((k, i) => (
-                                                    <li key={i}>{k.replace(/^\d+\.\s*/, '')}</li>
+                                                    <li key={i} className="text-justify">{k.replace(/^\d+\.\s*/, '')}</li>
                                                 ))}
                                             </ul>
                                         </td>
@@ -555,7 +616,7 @@ const RPMDisplay = ({ content, onReset, onEdit }) => {
                                             <div className="font-bold border-b pb-2 mb-2 italic">Mengaplikasi ({pengalamanBelajar?.inti?.mengaplikasi?.prinsip})</div>
                                             <ul className="list-decimal pl-5">
                                                 {pengalamanBelajar?.inti?.mengaplikasi?.kegiatan?.map((k, i) => (
-                                                    <li key={i}>{k.replace(/^\d+\.\s*/, '')}</li>
+                                                    <li key={i} className="text-justify">{k.replace(/^\d+\.\s*/, '')}</li>
                                                 ))}
                                             </ul>
                                         </td>
@@ -567,7 +628,7 @@ const RPMDisplay = ({ content, onReset, onEdit }) => {
                                             <div className="font-bold border-b pb-2 mb-2 italic">Merefleksi ({pengalamanBelajar?.inti?.merefleksi?.prinsip})</div>
                                             <ul className="list-decimal pl-5">
                                                 {pengalamanBelajar?.inti?.merefleksi?.kegiatan?.map((k, i) => (
-                                                    <li key={i}>{k.replace(/^\d+\.\s*/, '')}</li>
+                                                    <li key={i} className="text-justify">{k.replace(/^\d+\.\s*/, '')}</li>
                                                 ))}
                                             </ul>
                                         </td>
@@ -589,7 +650,7 @@ const RPMDisplay = ({ content, onReset, onEdit }) => {
                                     </td>
                                     <td colSpan={2}>
                                         <div className="font-bold mb-1">PENUTUP ({penutup?.prinsip})</div>
-                                        <div className="text-sm italic mb-2">{penutup?.deskripsi}</div>
+                                        <div className="text-sm italic mb-2 text-justify">{penutup?.deskripsi}</div>
                                     </td>
                                 </tr>
                             ) : (
@@ -639,13 +700,13 @@ const RPMDisplay = ({ content, onReset, onEdit }) => {
                                 </tr>
                             </thead>
                             <tbody>
-                                {rubrik?.indikator?.length > 0 ? rubrik.indikator.map((row, i) => (
+                                {Array.isArray(rubrik?.indikator) && rubrik.indikator.length > 0 ? rubrik.indikator.map((row, i) => (
                                     <tr key={i}>
-                                        <td>{row.aspek}</td>
-                                        <td>{row.baruBerkembang || '-'}</td>
-                                        <td>{row.layak || '-'}</td>
-                                        <td>{row.cakap || '-'}</td>
-                                        <td>{row.mahir || '-'}</td>
+                                        <td>{typeof row === 'object' ? row.aspek : row}</td>
+                                        <td>{typeof row === 'object' ? (row.baruBerkembang || '-') : '-'}</td>
+                                        <td>{typeof row === 'object' ? (row.layak || '-') : '-'}</td>
+                                        <td>{typeof row === 'object' ? (row.cakap || '-') : '-'}</td>
+                                        <td>{typeof row === 'object' ? (row.mahir || '-') : '-'}</td>
                                     </tr>
                                 )) : (
                                     <>
@@ -660,9 +721,9 @@ const RPMDisplay = ({ content, onReset, onEdit }) => {
                             <div className="text-sm">
                                 <strong>Keterangan:</strong>
                                 <ul className="list-disc ml-5">
-                                    {rubrik.keterangan.map((ket, i) => (
+                                    {Array.isArray(rubrik.keterangan) ? rubrik.keterangan.map((ket, i) => (
                                         <li key={i}>{ket}</li>
-                                    ))}
+                                    )) : <li>{rubrik.keterangan}</li>}
                                 </ul>
                             </div>
                         )}

@@ -4,6 +4,7 @@ import html2pdf from 'html2pdf.js';
 import { asBlob } from 'html-docx-js-typescript';
 import { saveAs } from 'file-saver';
 import ReactMarkdown from 'react-markdown';
+import logoKop from '../assets/logo-kop.png';
 
 // --- Error Boundary Component ---
 class ErrorBoundary extends Component {
@@ -207,7 +208,7 @@ const ModuleView = ({ content, onReset, onEdit }) => {
 
             <div className="bg-white p-8 md:p-12 rounded-2xl shadow-xl min-h-[500px]" ref={contentRef}>
                 {/* Kop Surat */}
-                <img src="/logo dan kop.png" alt="Kop Surat" className="w-full mb-6" />
+                <img src={logoKop} alt="Kop Surat" className="w-full mb-6" />
 
                 {/* Header Document */}
                 <div className="text-center mb-8">

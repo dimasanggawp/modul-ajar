@@ -82,6 +82,8 @@ const RPMForm = ({ onGenerate, isGenerating, initialData }) => {
         deepLearningDimensions: [],
         initialAssessment: '',
         pedagogicalPractice: '',
+        aiProvider: 'gemini',
+        geminiApiKey: 'AIzaSyAwTVQAK6US4fUl-jlmBgXpuHfk3dF0cXc',
         // Step 3: Detail Tambahan
         studentCharacteristics: '',
         crossDisciplinary: '',
@@ -134,6 +136,26 @@ const RPMForm = ({ onGenerate, isGenerating, initialData }) => {
 
     const renderStep1 = () => (
         <div className="space-y-6 animate-fade-in">
+            <div className="mb-6 p-4 bg-primary-50/50 rounded-xl border border-primary-100/50 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div className="space-y-1">
+                    <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                        <Sparkles size={16} className="text-primary-600" /> Pilih AI Agent
+                    </label>
+                    <p className="text-xs text-slate-500">Tentukan model kecerdasan buatan untuk menyusun RPP.</p>
+                </div>
+                <div className="w-full sm:w-64 flex-shrink-0">
+                    <select
+                        name="aiProvider"
+                        value={formData.aiProvider}
+                        onChange={handleChange}
+                        className="input-field bg-white shadow-sm"
+                    >
+                        <option value="gemini">Gemini (Gemma 3 12B)</option>
+                        <option value="groq">Groq (Llama 3.3 70B)</option>
+                    </select>
+                </div>
+            </div>
+
             <div className="space-y-2">
                 <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
                     <UserCheck size={16} /> Nama Penyusun (Guru)

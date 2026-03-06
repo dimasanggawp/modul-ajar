@@ -7,6 +7,8 @@ const groq = new Groq({
    dangerouslyAllowBrowser: true // Required for client-side usage
 });
 
+import { GoogleGenAI } from "@google/genai";
+
 export const generateModule = async (data) => {
    const DIMENSION_DESCRIPTIONS = {
       "Keimanan dan Ketakwaan terhadap Tuhan YME": "Membentuk karakter dengan landasan spiritual yang kuat dan akhlak mulia.",
@@ -19,7 +21,10 @@ export const generateModule = async (data) => {
       "Komunikasi": "Mampu menyampaikan ide dan berinteraksi secara efektif."
    };
 
-   const selectedDimensionsDesc = (data.deepLearningDimensions || []).map(d => `${d}: ${DIMENSION_DESCRIPTIONS[d] || ''}`).join('\n          // ');
+   const selectedDimensionsDesc = (data.deepLearningDimensions && data.deepLearningDimensions.length > 0)
+      ? data.deepLearningDimensions.map(d => `${d}: ${DIMENSION_DESCRIPTIONS[d] || ''}`).join('\n          // ')
+      : "PILIHLAH 2-3 DIMENSI DARI DAFTAR BERIKUT YANG PALING RELEVAN DENGAN TOPIK:\n" +
+      Object.entries(DIMENSION_DESCRIPTIONS).map(([k, v]) => `          // - ${k}: ${v}`).join('\n');
 
    try {
       const prompt = `
@@ -36,9 +41,9 @@ export const generateModule = async (data) => {
           "kelas": "${data.grade}",
           "semester": "${data.semester}",
           "alokasiWaktu": "${parseInt(data.duration) * parseInt(data.hoursPerMeeting) * parseInt(data.meetings)} Menit (${data.hoursPerMeeting} JP x ${data.duration} Menit x ${data.meetings} Pertemuan)",
-          "pesertaDidik": "${data.studentCharacteristics || 'Reguler/Tipikal'}",
+          "pesertaDidik": "${data.studentCharacteristics || 'Buatkan analisis: [Prasyarat Pengetahuan]: Apa saja materi dasar yang HARUS dikuasai siswa sebelum masuk ke topik ini? [Gaya Belajar]: Asumsikan beragam (Auditori, Visual, Kinestetik) untuk diferensiasi.'}",
           "materiPelajaran": "${data.topic}",
-          "dimensiProfil": ${JSON.stringify(data.deepLearningDimensions || [])}
+          "dimensiProfil": ${data.deepLearningDimensions && data.deepLearningDimensions.length > 0 ? JSON.stringify(data.deepLearningDimensions) : '["...Pilih 2-3 Dimensi Relevan (misal: Bernalar Kritis, Kreatif)..."]'}
         },
         "identifikasi": {
            "dpl": [
@@ -50,14 +55,14 @@ export const generateModule = async (data) => {
            ]
         },
         "desainPembelajaran": {
-           "capaianPembelajaran": "${data.learningOutcome || '-'}",
-           "lintasDisiplin": "${data.crossDisciplinary || '-'}",
-           "tujuanPembelajaran": "${data.learningGoals || '-'}",
+           "capaianPembelajaran": "${data.learningOutcome || `Buatkan 1 PARAGRAF UTUH Capaian Pembelajaran yang sesuai dengan Fase ${data.grade} untuk topik ${data.topic}.`}",
+           "lintasDisiplin": "${data.crossDisciplinary || 'Buatkan analisis: [Koneksi Antar Mapel]: Sebutkan minimal 2 mata pelajaran lain yang relevan dengan topik ini dan jelaskan hubungannya.'}",
+           "tujuanPembelajaran": "${data.learningGoals || `Buatkan 4-5 Tujuan Pembelajaran dalam bentuk LIST poin (1., 2., dst) yang spesifik untuk topik ${data.topic} dan Fase ${data.grade}.`}",
            "topik": "${data.topic}",
            "praktikPedagogis": "${data.pedagogicalPractice || '-'}",
-           "kemitraan": "${data.partnerships || '-'}",
-           "lingkungan": "${data.learningEnvironment || '-'}",
-           "digital": "${data.digitalTools || '-'}"
+           "kemitraan": "${data.partnerships || 'Berikan rekomendasi mitra yang bisa dilibatkan (Orang Tua/Komunitas/Ahli) untuk mendukung topik ini.'}",
+           "lingkungan": "${data.learningEnvironment || 'Buatkan analisis: [Lingkungan Fisik/Virtual]: Jelaskan pengaturan kelas (missal: U-Shape) atau platform digital yang mendukung topik ini. [Budaya Belajar]: Jelaskan suasana yang harus dibangun (inklusif, kolaboratif).'}",
+           "digital": "${data.digitalTools || 'Berikan rekomendasi Aplikasi/Platform digital (min. 2) yang spesifik untuk topik ini dan cara penggunaannya.'}"
         },
         "pengalamanBelajar": [
              // Generate an array of objects, one for EACH meeting.
@@ -124,22 +129,31 @@ export const generateModule = async (data) => {
       Karakteristik Siswa: ${data.studentCharacteristics || '-'}
     `;
 
-      const completion = await groq.chat.completions.create({
-         messages: [
-            {
-               role: "user",
-               content: prompt
-            }
-         ],
-         model: "llama-3.3-70b-versatile",
-         temperature: 0.7,
-         max_tokens: 8192,
-         response_format: { type: "json_object" }
-      });
-
-      return completion.choices[0]?.message?.content || "Gagal membuat modul.";
+      if (data.aiProvider === 'gemini') {
+         const ai = new GoogleGenAI({ apiKey: data.geminiApiKey });
+         try {
+            const res = await ai.models.generateContent({
+               model: 'gemini-2.5-flash',
+               contents: prompt,
+               config: { responseMimeType: 'application/json' }
+            });
+            return res.text;
+         } catch (err) {
+            console.error("Gemini attempt failed:", err);
+            throw err;
+         }
+      } else {
+         const completion = await groq.chat.completions.create({
+            messages: [{ role: "user", content: prompt }],
+            model: "llama-3.3-70b-versatile",
+            temperature: 0.7,
+            max_tokens: 8192,
+            response_format: { type: "json_object" }
+         });
+         return completion.choices[0]?.message?.content || "Gagal membuat modul.";
+      }
    } catch (error) {
-      console.error("Error generating module with Groq:", error);
+      console.error("Error generating module:", error);
       throw error;
    }
 };
@@ -208,8 +222,16 @@ export const generateStandardModule = async (data) => {
    };
 
    // Fallback for legacy data or if specific dimensions aren't selected
-   const selectedDimensions = data.profilPelajarPancasila || data.deepLearningDimensions || [];
-   const selectedDimensionsDesc = selectedDimensions.map(d => `${d}: ${DIMENSION_DESCRIPTIONS[d] || ''}`).join('\n             // ');
+   const selectedDimensions = (data.profilPelajarPancasila && data.profilPelajarPancasila.length > 0)
+      ? data.profilPelajarPancasila
+      : (data.deepLearningDimensions && data.deepLearningDimensions.length > 0)
+         ? data.deepLearningDimensions
+         : [];
+
+   const selectedDimensionsDesc = (selectedDimensions.length > 0)
+      ? selectedDimensions.map(d => `${d}: ${DIMENSION_DESCRIPTIONS[d] || ''}`).join('\n             // ')
+      : "PILIHLAH 2-3 DIMENSI DARI DAFTAR BERIKUT YANG PALING RELEVAN DENGAN TOPIK:\n" +
+      Object.entries(DIMENSION_DESCRIPTIONS).map(([k, v]) => `             // - ${k}: ${v}`).join('\n');
 
    try {
       const prompt = `
@@ -231,7 +253,7 @@ export const generateStandardModule = async (data) => {
              "alokasiWaktu": "${parseInt(data.duration) * parseInt(data.hoursPerMeeting) * parseInt(data.meetings)} Menit (${data.hoursPerMeeting} JP x ${data.duration} Menit x ${data.meetings} Pertemuan)",
              "jumlahPertemuan": "${data.meetings} Pertemuan",
              "jamPerPertemuan": "${data.hoursPerMeeting}",
-             "targetPesertaDidik": "${data.studentCharacteristics || 'Reguler'}"
+             "targetPesertaDidik": "${data.studentCharacteristics || 'Cantumkan Prasyarat Materi yang harus dikuasai siswa.'}"
            },
            "kompetensiAwal": "Deskripsi kompetensi awal...",
            "kompetensiSosialEmosional": [
@@ -278,7 +300,7 @@ export const generateStandardModule = async (data) => {
          "kompetensiInti": {
             "faseCP": "${data.grade.includes('Fase E') ? 'E' : 'F'}",
             "elemen": "${data.element || '-'}",
-            "capaianPembelajaran": "${data.learningOutcome || 'Capaian Pembelajaran belum diisi'}",
+            "capaianPembelajaran": "${data.learningOutcome || `Buatkan 1 PARAGRAF UTUH Capaian Pembelajaran yang sesuai dengan Fase ${data.grade} untuk topik ${data.topic}.`}",
             "materiPembelajaran": "${data.topic}",
             "kompetensi": "Kompetensi (skills/attitude) yang akan dicapai dalam modul ini...",
             "tujuanPembelajaran": {
@@ -378,26 +400,39 @@ export const generateStandardModule = async (data) => {
      `;
 
       const startTime = performance.now();
-      const completion = await groq.chat.completions.create({
-         messages: [
-            {
-               role: "user",
-               content: prompt
-            }
-         ],
-         model: "llama-3.3-70b-versatile",
-         temperature: 0.7,
-         max_tokens: 8192,
-         response_format: { type: "json_object" }
-      });
+      if (data.aiProvider === 'gemini') {
+         const ai = new GoogleGenAI({ apiKey: import.meta.env.VITE_GEMINI_API_KEY || 'AIzaSyAwTVQAK6US4fUl-jlmBgXpuHfk3dF0cXc' });
+         try {
+            const res = await ai.models.generateContent({
+               model: 'gemini-2.5-flash',
+               contents: prompt,
+               config: { responseMimeType: 'application/json' }
+            });
+            const endTime = performance.now();
+            const duration = (endTime - startTime).toFixed(2);
+            console.log(`Module generation took ${duration}ms (Gemini)`);
+            return res.text;
+         } catch (err) {
+            console.error("Gemini attempt failed:", err);
+            throw err;
+         }
+      } else {
+         const completion = await groq.chat.completions.create({
+            messages: [{ role: "user", content: prompt }],
+            model: "llama-3.3-70b-versatile",
+            temperature: 0.7,
+            max_tokens: 8192,
+            response_format: { type: "json_object" }
+         });
 
-      const endTime = performance.now();
-      const duration = (endTime - startTime).toFixed(2);
-      console.log(`Module generation took ${duration}ms`);
+         const endTime = performance.now();
+         const duration = (endTime - startTime).toFixed(2);
+         console.log(`Module generation took ${duration}ms (Groq)`);
 
-      return completion.choices[0]?.message?.content || "Gagal membuat modul.";
+         return completion.choices[0]?.message?.content || "Gagal membuat modul.";
+      }
    } catch (error) {
-      console.error("Error generating standard module with Groq:", error);
+      console.error("Error generating standard module:", error);
       throw error;
    }
 };

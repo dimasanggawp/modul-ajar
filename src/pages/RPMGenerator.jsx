@@ -18,8 +18,15 @@ function RPMGenerator() {
         setError(null);
         try {
             const content = await generateModule(formData);
-            // Try to parse if it's a string, otherwise use as is
-            const parsedContent = typeof content === 'string' ? JSON.parse(content) : content;
+
+            let parsedContent;
+            if (typeof content === 'string') {
+                const cleanContent = content.replace(/```json/g, '').replace(/```/g, '').trim();
+                parsedContent = JSON.parse(cleanContent);
+            } else {
+                parsedContent = content;
+            }
+
             setModuleContent(parsedContent);
         } catch (err) {
             console.error(err);
