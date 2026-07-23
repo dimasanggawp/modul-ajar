@@ -401,7 +401,7 @@ export const generateStandardModule = async (data) => {
 
       const startTime = performance.now();
       if (data.aiProvider === 'gemini') {
-         const ai = new GoogleGenAI({ apiKey: import.meta.env.VITE_GEMINI_API_KEY || 'AIzaSyAwTVQAK6US4fUl-jlmBgXpuHfk3dF0cXc' });
+         const ai = new GoogleGenAI({ apiKey: data.geminiApiKey || import.meta.env.VITE_GEMINI_API_KEY });
          try {
             const res = await ai.models.generateContent({
                model: 'gemini-2.5-flash',

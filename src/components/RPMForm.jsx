@@ -82,8 +82,8 @@ const RPMForm = ({ onGenerate, isGenerating, initialData }) => {
         deepLearningDimensions: [],
         initialAssessment: '',
         pedagogicalPractice: '',
-        aiProvider: 'gemini',
-        geminiApiKey: 'AIzaSyAwTVQAK6US4fUl-jlmBgXpuHfk3dF0cXc',
+        aiProvider: 'groq',
+        geminiApiKey: '',
         // Step 3: Detail Tambahan
         studentCharacteristics: '',
         crossDisciplinary: '',

@@ -13,6 +13,9 @@ dist-ssr
 *.local
 .env
 
+# graphify output (generated)
+graphify-out
+
 
 # Editor directories and files
 .vscode/*
